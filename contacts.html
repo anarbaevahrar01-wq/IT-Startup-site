@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Контакты — QR DINE</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="logo" href="index.html">QR<span>DINE</span></a>
+    <nav>
+      <a href="index.html">Главная</a>
+      <a href="menu.html">Демо-меню</a>
+      <a href="contacts.html" class="on">Контакты</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <h2>О команде</h2>
+  <section class="steps">
+    <div class="member"><b>Жұмали Али</b><p>Роль: Дизайн и вёрстка</p><p>Связь: 87771137806</p/p></div>
+    <div class="member"><b>Анарбаев Ахрар</b><p>Роль: Бэкенд</p><p>Связь: 87053291495</p/p></div>
+    <div class="member"><b>Ерболатұлы Құдірет</b><p>Роль: Поддержка клиентов</p><p>Связь: 87082542184</p/p></div>
+    <div class="member"><b>Болатбекова Анель</b><p>Роль: Реклама</p><p>Связь: 87083635580</p/p></div>
+  </section>
+
+  <h2>Хотите подключить своё кафе?</h2>
+  <form class="form" onsubmit="event.preventDefault();alert('Спасибо! Мы свяжемся с вами.')">
+    <input type="text" placeholder="Название кафе" required>
+    <input type="email" placeholder="Email" required>
+    <textarea rows="4" placeholder="Сообщение"></textarea>
+    <button class="btn" type="submit">Отправить заявку</button>
+  </form>
+</main>
+<footer>
+  <div class="wrap">© 2026 QR DINE — заказ в кафе по QR-коду без ожидания официанта</div>
+</footer>
+</body>
+</html>
