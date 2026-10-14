@@ -112,6 +112,16 @@ def create_application():
         )
 
     return jsonify({"success": True}), 201
+    
+@app.route("/api/orders", methods=["GET"])
+def get_orders():
+    with get_db() as db:
+        orders = db.execute(
+            "SELECT id, customer_name, dish, price FROM orders ORDER BY id DESC"
+        ).fetchall()
+        return jsonify([dict(order) for order in orders])
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
