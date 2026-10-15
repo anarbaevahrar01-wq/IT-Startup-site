@@ -1,207 +1,30 @@
-
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Меню — QR DINE</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .cart {
-      background: white;
-      padding: 24px;
-      border-radius: 12px;
-      margin-bottom: 40px;
-      border: 1px solid #ddd;
-    }
-    .cart-item {
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .cart input {
-      width: 100%;
-      max-width: 350px;
-      margin: 12px 0;
-    }
-    #message {
-      margin-top: 12px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-<header>
-  <div class="wrap">
-    <a class="logo" href="index.html">QR<span>DINE</span></a>
-    <nav>
-      <a href="index.html">Главная</a>
-      <a href="menu.html" class="on">Демо-меню</a>
-      <a href="contacts.html">Контакты</a>
-    </nav>
-  </div>
-</header>
-
-<main class="wrap">
-  <h2>Меню QR DINE</h2>
-  <p>Выберите блюда и оформите заказ.</p>
-
-  <section class="menu" id="menu">
-    <p>Загрузка меню...</p>
-  </section>
-
-  <h2>Ваша корзина</h2>
-  <section class="cart">
-    <div id="cart-items">Корзина пуста</div>
-    <h3 id="total">Итого: 0 ₸</h3>
-
-    <input id="customer" type="text"
-           placeholder="Ваше имя" required>
-
-    <div>
-      <button class="btn" onclick="placeOrder()">
-        Оформить заказ
-      </button>
-    </div>
-
-    <p id="message"></p>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    © 2026 QR DINE — заказ без ожидания официанта
-  </div>
-</footer>
-
+<!DOCTYPE html><html lang="kk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#102b25"><title>Мәзір — QR DINE</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="topbar">QR DINE • Дәм мен технология үйлесімі</div><header class="header"><div class="wrap navwrap"><a class="brand" href="index.html"><img src="logo.png.png.png" alt="QR DINE логотипі">QR <em>DINE</em></a><nav><a href="index.html">Басты бет</a><a class="on" href="menu.html">Мәзір</a><a href="contacts.html">Байланыс</a></nav><a class="nav-cta" href="#cart">Себетке өту ↓</a></div></header>
+<section class="page-head"><div class="wrap"><div class="eyebrow">Сүйікті дәміңізді табыңыз</div><h1>Біздің мәзір</h1><p>Тағамды таңдаңыз, себетке қосыңыз және тапсырысты жіберіңіз.</p></div></section>
+<main class="wrap section"><div class="menu-layout"><section><div id="menuGrid" class="menu-grid" aria-live="polite"><p class="loading">Мәзір жүктелуде...</p></div></section><aside class="cart" id="cart"><h2>🛒 Сіздің себетіңіз</h2><div id="cartItems"><p class="hint">Себет әзірге бос.</p></div><div class="total"><span>Барлығы:</span><span id="total">0 ₸</span></div><form id="orderForm"><label for="customerName" class="hint">Атыңыз</label><input class="field" id="customerName" name="customer_name" required maxlength="80" placeholder="Атыңызды енгізіңіз"><button class="btn" id="orderButton" type="submit">Тапсырыс беру →</button></form><div id="orderStatus" class="status" role="status" aria-live="polite"></div><p class="hint">Тапсырыс Flask серверіне жіберіліп, деректер базасына сақталады.</p></aside></div></main>
+<footer class="footer"><div class="wrap footer-inner"><strong>QR DINE</strong><span>© 2026 • Ыңғайлы тапсырыс беру жүйесі</span></div></footer>
 <script>
-const cart = [];
-let dishes = [];
-
-async function loadMenu() {
-  try {
-    const response = await fetch("/api/menu");
-    if (!response.ok) throw new Error("Ошибка сервера");
-
-    dishes = await response.json();
-    const container = document.getElementById("menu");
-    container.innerHTML = "";
-
-    dishes.forEach(dish => {
-      const card = document.createElement("div");
-      card.className = "dish";
-
-      const name = document.createElement("b");
-      name.textContent = dish.name;
-
-      const price = document.createElement("span");
-      price.className = "price";
-      price.textContent = dish.price + " ₸";
-
-      const button = document.createElement("button");
-      button.className = "btn";
-      button.textContent = "В корзину";
-      button.onclick = () => addToCart(dish);
-
-      card.append(name, price, button);
-      container.appendChild(card);
-    });
-  } catch (error) {
-    document.getElementById("menu").textContent =
-      "Не удалось загрузить меню";
-  }
-}
-
-function addToCart(dish) {
-  cart.push(dish);
-  updateCart();
-}
-
-function updateCart() {
-  const container = document.getElementById("cart-items");
-  container.innerHTML = "";
-
-  if (cart.length === 0) {
-    container.textContent = "Корзина пуста";
-  }
-
-  cart.forEach((dish, index) => {
-    const row = document.createElement("div");
-    row.className = "cart-item";
-
-    const label = document.createElement("span");
-    label.textContent = dish.name + " — " + dish.price + " ₸ ";
-
-    const remove = document.createElement("button");
-    remove.textContent = "Удалить";
-    remove.onclick = () => {
-      cart.splice(index, 1);
-      updateCart();
-    };
-
-    row.append(label, remove);
-    container.appendChild(row);
-  });
-
-  const total = cart.reduce(
-    (sum, dish) => sum + dish.price, 0
-  );
-  document.getElementById("total").textContent =
-    "Итого: " + total + " ₸";
-}
-
-async function placeOrder() {
-  const customer = document.getElementById("customer");
-  const message = document.getElementById("message");
-  const button = document.querySelector(".cart .btn");
-
-  const name = customer.value.trim();
-
-  if (!name || cart.length === 0) {
-    message.textContent =
-      "Введите имя и добавьте блюда в корзину";
-    return;
-  }
-
-  button.disabled = true;
-  message.textContent = "Отправка заказа...";
-
-  try {
-    // Текущий API сохраняет одно блюдо на одну запись.
-    // Поэтому отправляем блюда по очереди.
-    for (const dish of cart) {
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          customer_name: name,
-          dish: dish.name
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error("Ошибка сохранения заказа");
-      }
-    }
-
-    cart.length = 0;
-    updateCart();
-    customer.value = "";
-    message.textContent =
-      "Заказ успешно отправлен! Спасибо!";
-    message.style.color = "green";
-
-  } catch (error) {
-    message.textContent =
-      "Ошибка отправки. Проверьте заказ.";
-    message.style.color = "red";
-  } finally {
-    button.disabled = false;
-  }
-}
-
+'use strict';
+const photoBase='https://images.unsplash.com/';
+const photos=[
+ {keys:['бешбар','besh'],id:'photo-1547592180-85f173990554',description:'Қазақтың ұлттық тағамы'},
+ {keys:['лагман','лағман'],id:'photo-1569718212165-3a8278d5f624',description:'Ет пен көкөніс қосылған кеспе'},
+ {keys:['цезарь'],id:'photo-1512621776951-a57141f2eefd',description:'Тауық еті қосылған салат'},
+ {keys:['самса'],id:'photo-1601050690597-df0568f70950',description:'Қытырлақ қамырдағы дәм'},
+ {keys:['шұбат'],id:'photo-1550583724-b2692b85b150',description:'Дәстүрлі сусын'},
+ {keys:['чай','шай'],id:'photo-1544787219-7f47ccb76574',description:'Жылы әрі хош иісті шай'},
+ {keys:['палау','плов'],id:'photo-1512058564366-18510be2db19',description:'Хош иісті күріш тағамы'},
+ {keys:['манты','мәнті'],id:'photo-1563245372-f21724e3856d',description:'Буға піскен дәмді тағам'}
+];
+let dishes=[],cart=new Map();
+const money=n=>new Intl.NumberFormat('kk-KZ').format(n)+' ₸';
+function imageFor(name){const n=name.toLowerCase();const match=photos.find(p=>p.keys.some(k=>n.includes(k)));return match||{id:'photo-1547592180-85f173990554',description:'Дәмді тағам'};}
+function make(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
+async function loadMenu(){const grid=document.getElementById('menuGrid');try{const res=await fetch('/api/menu');if(!res.ok)throw new Error('Мәзірді жүктеу мүмкін болмады');const data=await res.json();if(!Array.isArray(data))throw new Error('Қате деректер');dishes=data;grid.replaceChildren();for(const dish of dishes){const info=imageFor(String(dish.name));const card=make('article','food-card');const img=make('img','food-img');img.src=photoBase+info.id+'?w=720&q=82&fit=crop';img.alt=String(dish.name);img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src='https://placehold.co/720x450/163a2f/e6c487?text=QR+DINE';};const body=make('div','food-body');body.append(make('h3','',String(dish.name)),make('p','',info.description));const bottom=make('div','food-bottom');bottom.append(make('span','price',money(Number(dish.price))));const add=make('button','small-btn','+ Себетке');add.type='button';add.addEventListener('click',()=>addToCart(dish));bottom.append(add);body.append(bottom);card.append(img,body);grid.append(card);}if(!dishes.length)grid.textContent='Мәзір әзірге бос.';}catch(e){grid.replaceChildren(make('p','status err','Мәзір жүктелмеді. Flask серверін тексеріңіз.'));}}
+function addToCart(dish){const id=String(dish.id);const old=cart.get(id);cart.set(id,{dish,qty:(old?.qty||0)+1});renderCart();}
+function changeQty(id,delta){const item=cart.get(id);if(!item)return;item.qty+=delta;if(item.qty<=0)cart.delete(id);renderCart();}
+function renderCart(){const el=document.getElementById('cartItems');el.replaceChildren();let total=0;if(!cart.size)el.append(make('p','hint','Себет әзірге бос.'));for(const [id,{dish,qty}] of cart){total+=Number(dish.price)*qty;const line=make('div','cart-item');const info=make('div');info.append(make('strong','',String(dish.name)),make('small','',money(Number(dish.price)*qty)));const controls=make('div','qty');const minus=make('button','','−');minus.type='button';minus.setAttribute('aria-label','Біреуін азайту');minus.onclick=()=>changeQty(id,-1);const plus=make('button','','+');plus.type='button';plus.setAttribute('aria-label','Біреуін қосу');plus.onclick=()=>changeQty(id,1);controls.append(minus,make('span','',String(qty)),plus);line.append(info,controls);el.append(line);}document.getElementById('total').textContent=money(total);}
+const status=document.getElementById('orderStatus');
+document.getElementById('orderForm').addEventListener('submit',async e=>{e.preventDefault();const name=document.getElementById('customerName').value.trim();if(!name){status.className='status err';status.textContent='Атыңызды енгізіңіз.';return;}if(!cart.size){status.className='status err';status.textContent='Алдымен тағам таңдаңыз.';return;}const btn=document.getElementById('orderButton');btn.disabled=true;btn.textContent='Жіберілуде...';status.textContent='';try{let sent=0;for(const {dish,qty} of cart.values()){for(let i=0;i<qty;i++){const res=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer_name:name,dish:dish.name})});if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error||'Тапсырыс жіберілмеді');}sent++;}}cart.clear();renderCart();document.getElementById('orderForm').reset();status.className='status ok';status.textContent='✓ Тапсырысыңыз қабылданды! '+sent+' тағам серверге сақталды.';}catch(err){status.className='status err';status.textContent='Қате: '+err.message+'. Кейбір тағамдар сақталған болуы мүмкін, қайталап жібермес бұрын тексеріңіз.';}finally{btn.disabled=false;btn.textContent='Тапсырыс беру →';}});
 loadMenu();
-</script>
-</body>
-</html>
+</script></body></html>
