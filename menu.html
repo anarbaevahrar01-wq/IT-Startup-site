@@ -5,22 +5,25 @@
 <footer class="footer"><div class="wrap footer-inner"><strong>QR DINE</strong><span>© 2026 • Ыңғайлы тапсырыс беру жүйесі</span></div></footer>
 <script>
 'use strict';
-const photoBase='https://images.unsplash.com/';
-const photos=[
- {keys:['бешбар','besh'],id:'photo-1547592180-85f173990554',description:'Қазақтың ұлттық тағамы'},
- {keys:['лагман','лағман'],id:'photo-1569718212165-3a8278d5f624',description:'Ет пен көкөніс қосылған кеспе'},
- {keys:['цезарь'],id:'photo-1512621776951-a57141f2eefd',description:'Тауық еті қосылған салат'},
- {keys:['самса'],id:'photo-1601050690597-df0568f70950',description:'Қытырлақ қамырдағы дәм'},
- {keys:['шұбат'],id:'photo-1550583724-b2692b85b150',description:'Дәстүрлі сусын'},
- {keys:['чай','шай'],id:'photo-1544787219-7f47ccb76574',description:'Жылы әрі хош иісті шай'},
- {keys:['палау','плов'],id:'photo-1512058564366-18510be2db19',description:'Хош иісті күріш тағамы'},
- {keys:['манты','мәнті'],id:'photo-1563245372-f21724e3856d',description:'Буға піскен дәмді тағам'}
+const photos = [
+  {keys:['бешбар','besh'],id:'images/beshbarmak.jpg',description:'Қазақтың ұлттық тағамы'},
+  {keys:['лагман','лағман'],id:'images/lagman.jpg',description:'Ет пен көкөніс қосылған кеспе'},
+  {keys:['цезарь'],id:'images/caesar.jpg',description:'Тауық еті қосылған салат'},
+  {keys:['самса'],id:'images/samsa.jpg',description:'Қытырлақ қамырдағы дәм'},
+  {keys:['шұбат'],id:'images/shubat.jpg',description:'Дәстүрлі сусын'},
+  {keys:['чай','шай'],id:'images/tea.jpg',description:'Хош иісті шай'},
+  {keys:['палау','плов'],id:'images/plov.jpg',description:'Хош иісті күріш тағамы'},
+  {keys:['манты','мәнті'],id:'images/manty.jpg',description:'Буға піскен дәмді тағам'}
 ];
 let dishes=[],cart=new Map();
 const money=n=>new Intl.NumberFormat('kk-KZ').format(n)+' ₸';
-function imageFor(name){const n=name.toLowerCase();const match=photos.find(p=>p.keys.some(k=>n.includes(k)));return match||{id:'photo-1547592180-85f173990554',description:'Дәмді тағам'};}
+function imageFor(name) {
+  const n = name.toLowerCase();
+  return photos.find(p => p.keys.some(k => n.includes(k)))
+    || {id:'images/default.jpg', description:'Дәмді тағам'};
+}
 function make(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
-async function loadMenu(){const grid=document.getElementById('menuGrid');try{const res=await fetch('/api/menu');if(!res.ok)throw new Error('Мәзірді жүктеу мүмкін болмады');const data=await res.json();if(!Array.isArray(data))throw new Error('Қате деректер');dishes=data;grid.replaceChildren();for(const dish of dishes){const info=imageFor(String(dish.name));const card=make('article','food-card');const img=make('img','food-img');img.src=photoBase+info.id+'?w=720&q=82&fit=crop';img.alt=String(dish.name);img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src='https://placehold.co/720x450/163a2f/e6c487?text=QR+DINE';};const body=make('div','food-body');body.append(make('h3','',String(dish.name)),make('p','',info.description));const bottom=make('div','food-bottom');bottom.append(make('span','price',money(Number(dish.price))));const add=make('button','small-btn','+ Себетке');add.type='button';add.addEventListener('click',()=>addToCart(dish));bottom.append(add);body.append(bottom);card.append(img,body);grid.append(card);}if(!dishes.length)grid.textContent='Мәзір әзірге бос.';}catch(e){grid.replaceChildren(make('p','status err','Мәзір жүктелмеді. Flask серверін тексеріңіз.'));}}
+async function loadMenu(){const grid=document.getElementById('menuGrid');try{const res=await fetch('/api/menu');if(!res.ok)throw new Error('Мәзірді жүктеу мүмкін болмады');const data=await res.json();if(!Array.isArray(data))throw new Error('Қате деректер');dishes=data;grid.replaceChildren();for(const dish of dishes){const info=imageFor(String(dish.name));const card=make('article','food-card');const img=make('img','food-img');img.src=info.id;;img.alt=String(dish.name);img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src='https://placehold.co/720x450/163a2f/e6c487?text=QR+DINE';};const body=make('div','food-body');body.append(make('h3','',String(dish.name)),make('p','',info.description));const bottom=make('div','food-bottom');bottom.append(make('span','price',money(Number(dish.price))));const add=make('button','small-btn','+ Себетке');add.type='button';add.addEventListener('click',()=>addToCart(dish));bottom.append(add);body.append(bottom);card.append(img,body);grid.append(card);}if(!dishes.length)grid.textContent='Мәзір әзірге бос.';}catch(e){grid.replaceChildren(make('p','status err','Мәзір жүктелмеді. Flask серверін тексеріңіз.'));}}
 function addToCart(dish){const id=String(dish.id);const old=cart.get(id);cart.set(id,{dish,qty:(old?.qty||0)+1});renderCart();}
 function changeQty(id,delta){const item=cart.get(id);if(!item)return;item.qty+=delta;if(item.qty<=0)cart.delete(id);renderCart();}
 function renderCart(){const el=document.getElementById('cartItems');el.replaceChildren();let total=0;if(!cart.size)el.append(make('p','hint','Себет әзірге бос.'));for(const [id,{dish,qty}] of cart){total+=Number(dish.price)*qty;const line=make('div','cart-item');const info=make('div');info.append(make('strong','',String(dish.name)),make('small','',money(Number(dish.price)*qty)));const controls=make('div','qty');const minus=make('button','','−');minus.type='button';minus.setAttribute('aria-label','Біреуін азайту');minus.onclick=()=>changeQty(id,-1);const plus=make('button','','+');plus.type='button';plus.setAttribute('aria-label','Біреуін қосу');plus.onclick=()=>changeQty(id,1);controls.append(minus,make('span','',String(qty)),plus);line.append(info,controls);el.append(line);}document.getElementById('total').textContent=money(total);}
