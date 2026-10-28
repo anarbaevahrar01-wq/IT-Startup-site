@@ -1,11 +1,16 @@
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, session
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 import sqlite3
 import os
-
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "qr_dine.db")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "local-development-only")
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = os.environ.get("RENDER") == "true"
 
 def get_db():
     db = sqlite3.connect(DB_PATH)
@@ -120,6 +125,124 @@ def get_orders():
             "SELECT id, customer_name, dish, price FROM orders ORDER BY id DESC"
         ).fetchall()
         return jsonify([dict(order) for order in orders])
+        
+# ---------- ТІРКЕЛУ ----------
+@app.route("/api/register", methods=["POST"])
+def register():
+    data = request.get_json(silent=True) or {}
+
+    name = str(data.get("name", "")).strip()
+    email = str(data.get("email", "")).strip().lower()
+    password = str(data.get("password", ""))
+
+    if not name or not email or not password:
+        return jsonify({"error": "Барлық өрісті толтырыңыз"}), 400
+
+    if len(password) < 8:
+        return jsonify({
+            "error": "Құпиясөз кемінде 8 таңбадан тұруы керек"
+        }), 400
+
+    if "@" not in email or len(email) > 254:
+        return jsonify({"error": "Email дұрыс емес"}), 400
+
+    password_hash = generate_password_hash(password)
+
+    try:
+        with get_db() as db:
+            cursor = db.execute(
+                """INSERT INTO users
+                   (name, email, password_hash)
+                   VALUES (?, ?, ?)""",
+                (name, email, password_hash)
+            )
+            user_id = cursor.lastrowid
+
+    except sqlite3.IntegrityError:
+        return jsonify({
+            "error": "Бұл email бұрын тіркелген"
+        }), 409
+
+    session.clear()
+    session["user_id"] = user_id
+
+    return jsonify({
+        "success": True,
+        "message": "Тіркелу сәтті өтті",
+        "user": {
+            "id": user_id,
+            "name": name,
+            "email": email
+        }
+    }), 201
+
+
+# ---------- ЖҮЙЕГЕ КІРУ ----------
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.get_json(silent=True) or {}
+
+    email = str(data.get("email", "")).strip().lower()
+    password = str(data.get("password", ""))
+
+    with get_db() as db:
+        user = db.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+
+    if user is None or not check_password_hash(
+        user["password_hash"], password
+    ):
+        return jsonify({
+            "error": "Email немесе құпиясөз қате"
+        }), 401
+
+    session.clear()
+    session["user_id"] = user["id"]
+
+    return jsonify({
+        "success": True,
+        "message": "Жүйеге сәтті кірдіңіз",
+        "user": {
+            "id": user["id"],
+            "name": user["name"],
+            "email": user["email"]
+        }
+    })
+
+
+# ---------- ПРОФИЛЬ ----------
+@app.route("/api/me", methods=["GET"])
+def my_profile():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Жүйеге кіріңіз"}), 401
+
+    with get_db() as db:
+        user = db.execute(
+            "SELECT id, name, email FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+
+    if not user:
+        session.clear()
+        return jsonify({"error": "Аккаунт табылмады"}), 401
+
+    return jsonify(dict(user))
+
+
+# ---------- ШЫҒУ ----------
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return jsonify({
+        "success": True,
+        "message": "Аккаунттан шықтыңыз"
+    })
+
+        
 
 
 if __name__ == "__main__":
