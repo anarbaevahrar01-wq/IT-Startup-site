@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кіру — QR DINE</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .login-box {
+      max-width: 420px;
+      margin: 70px auto;
+      padding: 35px;
+      border-radius: 18px;
+      background: #102b25;
+      color: white;
+    }
+    .login-box h1 {
+      color: #e8c477;
+      text-align: center;
+    }
+    .login-box input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      margin: 15px 0;
+      border-radius: 8px;
+      border: none;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      background: #e8c477;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #message {
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <h1>QR DINE</h1>
+  <h2>Жүйеге кіру</h2>
+
+  <form id="loginForm">
+    <input type="email" id="email"
+           placeholder="Email" required>
+
+    <input type="password" id="password"
+           placeholder="Құпиясөз" required>
+
+    <button type="submit">Кіру</button>
+  </form>
+
+  <p id="message" role="status"></p>
+
+  <p>
+    Аккаунтыңыз жоқ па?
+    <a href="register.html" style="color:#e8c477">
+      Тіркелу
+    </a>
+  </p>
+
+  <a href="index.html" style="color:#e8c477">
+    ← Басты бетке
+  </a>
+</div>
+
+<script>
+document.getElementById("loginForm")
+  .addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const message = document.getElementById("message");
+    message.textContent = "Тексеріліп жатыр...";
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        credentials: "same-origin",
+        body: JSON.stringify({
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        message.style.color = "#a8f0c6";
+        message.textContent = "Жүйеге сәтті кірдіңіз!";
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1000);
+      } else {
+        message.style.color = "#ffb4b4";
+        message.textContent =
+          result.error || "Кіру кезінде қате шықты";
+      }
+    } catch (error) {
+      message.style.color = "#ffb4b4";
+      message.textContent = "Сервермен байланыс қатесі";
+    }
+  });
+</script>
+
+</body>
+</html>
