@@ -259,6 +259,31 @@ def logout():
         "success": True,
         "message": "Аккаунттан шықтыңыз"
     })
+    
+@app.route("/api/admin/users", methods=["GET"])
+def admin_users():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Жүйеге кіріңіз"}), 401
+
+    with get_db() as db:
+        admin = db.execute(
+            "SELECT email FROM users WHERE id = ?",
+            (user_id,)
+        ).fetchone()
+
+        admin_email = os.environ.get("ADMIN_EMAIL", "").strip().lower()
+
+        if not admin or not admin_email or admin["email"].lower() != admin_email:
+            return jsonify({"error": "Рұқсат жоқ"}), 403
+
+        users = db.execute(
+            "SELECT id, name, email FROM users ORDER BY id DESC"
+        ).fetchall()
+
+    return jsonify([dict(user) for user in users])
+
 
         
 
