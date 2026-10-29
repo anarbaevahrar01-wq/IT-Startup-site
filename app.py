@@ -42,6 +42,24 @@ def init_db():
                 message TEXT
             )
         """)
+
+
+
+
+
+
+        
+        
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL
+            )
+        """)
+
+        
         if db.execute("SELECT COUNT(*) FROM menu").fetchone()[0] == 0:
             db.executemany(
                 "INSERT INTO menu (name, price) VALUES (?, ?)",
