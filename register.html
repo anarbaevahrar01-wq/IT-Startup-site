@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тіркелу — QR DINE</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .register-box {
+      max-width: 420px;
+      margin: 70px auto;
+      padding: 35px;
+      background: #102b25;
+      color: white;
+      border-radius: 18px;
+    }
+    .register-box h1 {
+      color: #e8c477;
+      text-align: center;
+    }
+    .register-box input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .register-box button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #e8c477;
+      color: #102b25;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #message {
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="register-box">
+  <h1>QR DINE</h1>
+  <h2>Тіркелу</h2>
+
+  <form id="registerForm">
+    <input id="name" placeholder="Аты-жөніңіз"
+           required maxlength="100">
+
+    <input id="email" type="email"
+           placeholder="Email" required>
+
+    <input id="password" type="password"
+           placeholder="Құпиясөз (кемінде 8 таңба)"
+           minlength="8" required>
+
+    <button type="submit">Тіркелу</button>
+  </form>
+
+  <p id="message" role="status"></p>
+  <p><a href="index.html" style="color:#e8c477">
+    ← Басты бетке
+  </a></p>
+</div>
+
+<script>
+document.getElementById("registerForm")
+  .addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const message = document.getElementById("message");
+    message.textContent = "Тіркеліп жатыр...";
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        credentials: "same-origin",
+        body: JSON.stringify({
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        message.textContent = "Тіркелу сәтті өтті!";
+        message.style.color = "#a8f0c6";
+        document.getElementById("registerForm").reset();
+      } else {
+        message.textContent = result.error || "Қате пайда болды";
+        message.style.color = "#ffb4b4";
+      }
+    } catch (error) {
+      message.textContent = "Сервермен байланыс қатесі";
+      message.style.color = "#ffb4b4";
+    }
+  });
+</script>
+
+</body>
+</html>
