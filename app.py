@@ -283,6 +283,36 @@ def admin_users():
         ).fetchall()
 
     return jsonify([dict(user) for user in users])
+    
+@app.route("/api/cafes", methods=["GET"])
+def get_cafes():
+    with get_db() as db:
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS cafes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                address TEXT,
+                image TEXT
+            )
+        """)
+
+        if db.execute("SELECT COUNT(*) FROM cafes").fetchone()[0] == 0:
+            db.executemany(
+                "INSERT INTO cafes (name, address, image) VALUES (?, ?, ?)",
+                [
+                    ("QR DINE Cafe", "Алматы", ""),
+                    ("Coffee House", "Алматы", ""),
+                    ("Burger House", "Алматы", "")
+                ]
+            )
+
+        cafes = db.execute(
+            "SELECT id, name, address, image FROM cafes ORDER BY id"
+        ).fetchall()
+
+    return jsonify([dict(cafe) for cafe in cafes])
+
+    
 
 
         
