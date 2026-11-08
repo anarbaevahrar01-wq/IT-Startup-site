@@ -1,33 +1,422 @@
-<!DOCTYPE html><html lang="kk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#102b25"><title>Мәзір — QR DINE</title><link rel="stylesheet" href="style.css"></head><body>
-<div class="topbar">QR DINE • Дәм мен технология үйлесімі</div><header class="header"><div class="wrap navwrap"><a class="brand" href="index.html"><img src="logo.png.png.png" alt="QR DINE логотипі">QR <em>DINE</em></a><nav><a href="index.html">Басты бет</a><a class="on" href="menu.html">Мәзір</a><a href="contacts.html">Байланыс</a></nav><a class="nav-cta" href="#cart">Себетке өту ↓</a></div></header>
-<section class="page-head"><div class="wrap"><div class="eyebrow">Сүйікті дәміңізді табыңыз</div><h1>Біздің мәзір</h1><p>Тағамды таңдаңыз, себетке қосыңыз және тапсырысты жіберіңіз.</p></div></section>
-<main class="wrap section"><div class="menu-layout"><section><div id="menuGrid" class="menu-grid" aria-live="polite"><p class="loading">Мәзір жүктелуде...</p></div></section><aside class="cart" id="cart"><h2>🛒 Сіздің себетіңіз</h2><div id="cartItems"><p class="hint">Себет әзірге бос.</p></div><div class="total"><span>Барлығы:</span><span id="total">0 ₸</span></div><form id="orderForm"><label for="customerName" class="hint">Атыңыз</label><input class="field" id="customerName" name="customer_name" required maxlength="80" placeholder="Атыңызды енгізіңіз"><button class="btn" id="orderButton" type="submit">Тапсырыс беру →</button></form><div id="orderStatus" class="status" role="status" aria-live="polite"></div><p class="hint">Тапсырыс Flask серверіне жіберіліп, деректер базасына сақталады.</p></aside></div></main>
-<footer class="footer"><div class="wrap footer-inner"><strong>QR DINE</strong><span>© 2026 • Ыңғайлы тапсырыс беру жүйесі</span></div></footer>
-<script>
-'use strict';
-const photos = [
-  {keys:['бешбар','besh'],id:'images/beshbarmak.jpg.png',description:'Қазақтың ұлттық тағамы'},
-  {keys:['лагман','лағман'],id:'images/lagman.jpg',description:'Ет пен көкөніс қосылған кеспе'},
-  {keys:['цезарь'],id:'images/caesar.jpg',description:'Тауық еті қосылған салат'},
-  {keys:['самса'],id:'images/samsa.jpg',description:'Қытырлақ қамырдағы дәм'},
-  {keys:['шұбат'],id:'images/shubat.jpg',description:'Дәстүрлі сусын'},
-  {keys:['чай','шай'],id:'images/tea.jpg',description:'Хош иісті шай'},
-  {keys:['палау','плов'],id:'images/plov.jpg',description:'Хош иісті күріш тағамы'},
-  {keys:['манты','мәнті'],id:'images/manty.jpg',description:'Буға піскен дәмді тағам'}
-];
-let dishes=[],cart=new Map();
-const money=n=>new Intl.NumberFormat('kk-KZ').format(n)+' ₸';
-function imageFor(name) {
-  const n = name.toLowerCase();
-  return photos.find(p => p.keys.some(k => n.includes(k)))
-    || {id:'images/default.jpg', description:'Дәмді тағам'};
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volidam — Мәзір | QR DINE</title>
+
+<style>
+:root {
+  --green: #102d27;
+  --gold: #d6b36a;
+  --bg: #f7f6f2;
 }
-function make(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
-async function loadMenu(){const grid=document.getElementById('menuGrid');try{const res=await fetch('/api/menu');if(!res.ok)throw new Error('Мәзірді жүктеу мүмкін болмады');const data=await res.json();if(!Array.isArray(data))throw new Error('Қате деректер');dishes=data;grid.replaceChildren();for(const dish of dishes){const info=imageFor(String(dish.name));const card=make('article','food-card');const img=make('img','food-img');img.src=info.id;;img.alt=String(dish.name);img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src='https://placehold.co/720x450/163a2f/e6c487?text=QR+DINE';};const body=make('div','food-body');body.append(make('h3','',String(dish.name)),make('p','',info.description));const bottom=make('div','food-bottom');bottom.append(make('span','price',money(Number(dish.price))));const add=make('button','small-btn','+ Себетке');add.type='button';add.addEventListener('click',()=>addToCart(dish));bottom.append(add);body.append(bottom);card.append(img,body);grid.append(card);}if(!dishes.length)grid.textContent='Мәзір әзірге бос.';}catch(e){grid.replaceChildren(make('p','status err','Мәзір жүктелмеді. Flask серверін тексеріңіз.'));}}
-function addToCart(dish){const id=String(dish.id);const old=cart.get(id);cart.set(id,{dish,qty:(old?.qty||0)+1});renderCart();}
-function changeQty(id,delta){const item=cart.get(id);if(!item)return;item.qty+=delta;if(item.qty<=0)cart.delete(id);renderCart();}
-function renderCart(){const el=document.getElementById('cartItems');el.replaceChildren();let total=0;if(!cart.size)el.append(make('p','hint','Себет әзірге бос.'));for(const [id,{dish,qty}] of cart){total+=Number(dish.price)*qty;const line=make('div','cart-item');const info=make('div');info.append(make('strong','',String(dish.name)),make('small','',money(Number(dish.price)*qty)));const controls=make('div','qty');const minus=make('button','','−');minus.type='button';minus.setAttribute('aria-label','Біреуін азайту');minus.onclick=()=>changeQty(id,-1);const plus=make('button','','+');plus.type='button';plus.setAttribute('aria-label','Біреуін қосу');plus.onclick=()=>changeQty(id,1);controls.append(minus,make('span','',String(qty)),plus);line.append(info,controls);el.append(line);}document.getElementById('total').textContent=money(total);}
-const status=document.getElementById('orderStatus');
-document.getElementById('orderForm').addEventListener('submit',async e=>{e.preventDefault();const name=document.getElementById('customerName').value.trim();if(!name){status.className='status err';status.textContent='Атыңызды енгізіңіз.';return;}if(!cart.size){status.className='status err';status.textContent='Алдымен тағам таңдаңыз.';return;}const btn=document.getElementById('orderButton');btn.disabled=true;btn.textContent='Жіберілуде...';status.textContent='';try{let sent=0;for(const {dish,qty} of cart.values()){for(let i=0;i<qty;i++){const res=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer_name:name,dish:dish.name})});if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error||'Тапсырыс жіберілмеді');}sent++;}}cart.clear();renderCart();document.getElementById('orderForm').reset();status.className='status ok';status.textContent='✓ Тапсырысыңыз қабылданды! '+sent+' тағам серверге сақталды.';}catch(err){status.className='status err';status.textContent='Қате: '+err.message+'. Кейбір тағамдар сақталған болуы мүмкін, қайталап жібермес бұрын тексеріңіз.';}finally{btn.disabled=false;btn.textContent='Тапсырыс беру →';}});
-loadMenu();
-</script></body></html>
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: #20342e;
+}
+
+header {
+  background: var(--green);
+  color: white;
+  padding: 25px 20px;
+  text-align: center;
+}
+
+header a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+header h1 { margin-bottom: 8px; }
+
+.container {
+  max-width: 1050px;
+  margin: auto;
+  padding: 25px 15px;
+}
+
+.panel {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 22px #00000010;
+}
+
+.cabins {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.cabins a {
+  text-align: center;
+  padding: 15px 5px;
+  border: 1px solid #d9ded6;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--green);
+  font-weight: bold;
+}
+
+.cabins a.active {
+  background: var(--green);
+  color: white;
+}
+
+.foods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.food {
+  padding: 18px;
+  border: 1px solid #e4e5de;
+  border-radius: 14px;
+}
+
+.food h3 { margin-top: 0; }
+
+.price {
+  color: #94702e;
+  font-weight: bold;
+  margin: 12px 0;
+}
+
+button {
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-item button { padding: 7px 12px; }
+
+input {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 13px;
+  border: 1px solid #ccd4cc;
+  border-radius: 10px;
+  margin: 15px 0;
+  font-size: 16px;
+}
+
+#menuPanel, #cartPanel { display: none; }
+
+#result { font-weight: bold; }
+
+@media (min-width: 720px) {
+  .cabins {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="/">← QR DINE</a>
+  <h1>VOLIDAM</h1>
+  <p id="cabinLabel">Кабинканы таңдаңыз</p>
+</header>
+
+<main class="container">
+
+<section class="panel">
+  <h2>Кабинкалар</h2>
+  <p>Өзіңіздің кабинкаңызды таңдаңыз.</p>
+  <div class="cabins" id="cabins"></div>
+</section>
+
+<section class="panel" id="menuPanel">
+  <h2>Тағамдар мәзірі</h2>
+  <p>
+    Бұл әзірге демонстрациялық мәзір.
+    Volidam-ның нақты мәзірі кейін қосылады.
+  </p>
+  <p id="menuStatus">Жүктелуде...</p>
+  <div class="foods" id="foods"></div>
+</section>
+
+<section class="panel" id="cartPanel">
+  <h2>Себет</h2>
+  <div id="cartItems"></div>
+
+  <h3>Жалпы: <span id="total">0 ₸</span></h3>
+
+  <label for="customer">Атыңыз</label>
+  <input
+    id="customer"
+    placeholder="Атыңызды жазыңыз"
+    maxlength="100"
+  >
+
+  <button id="send" onclick="sendOrder()">
+    Тапсырыс беру
+  </button>
+
+  <p id="result"></p>
+</section>
+
+</main>
+
+<script>
+const params = new URLSearchParams(location.search);
+const cabin = Number(params.get("cabin"));
+
+const validCabin =
+  Number.isInteger(cabin) &&
+  cabin >= 1 &&
+  cabin <= 6;
+
+const cart = new Map();
+let dishes = [];
+let sending = false;
+
+const $ = id => document.getElementById(id);
+
+const money = value =>
+  new Intl.NumberFormat("kk-KZ").format(value) + " ₸";
+
+// 6 кабинканы көрсету
+for (let i = 1; i <= 6; i++) {
+  const link = document.createElement("a");
+
+  link.href = "/menu.html?cabin=" + i;
+  link.textContent = "№" + i;
+
+  if (validCabin && cabin === i) {
+    link.className = "active";
+  }
+
+  $("cabins").appendChild(link);
+}
+
+if (validCabin) {
+  $("cabinLabel").textContent = "Кабинка №" + cabin;
+  $("menuPanel").style.display = "block";
+  $("cartPanel").style.display = "block";
+  loadMenu();
+}
+
+// Серверден мәзір алу
+async function loadMenu() {
+  try {
+    const response = await fetch("/api/menu");
+
+    if (!response.ok) {
+      throw new Error("Мәзір жүктелмеді");
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      throw new Error("Мәзір деректері қате");
+    }
+
+    dishes = data.filter(item =>
+      Number.isInteger(item.id) &&
+      typeof item.name === "string" &&
+      Number.isFinite(item.price)
+    );
+
+    $("menuStatus").textContent =
+      dishes.length ? "" : "Мәзір бос";
+
+    dishes.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "food";
+
+      const title = document.createElement("h3");
+      title.textContent = item.name;
+
+      const price = document.createElement("p");
+      price.className = "price";
+      price.textContent = money(item.price);
+
+      const button = document.createElement("button");
+      button.textContent = "Себетке қосу";
+
+      button.onclick = () => {
+        cart.set(item.id, (cart.get(item.id) || 0) + 1);
+        renderCart();
+      };
+
+      card.append(title, price, button);
+      $("foods").appendChild(card);
+    });
+
+  } catch (error) {
+    $("menuStatus").textContent =
+      "Мәзір жүктелмеді. Бетті жаңартыңыз.";
+  }
+}
+
+// Себетті көрсету
+function renderCart() {
+  $("cartItems").replaceChildren();
+
+  let total = 0;
+
+  for (const [id, quantity] of cart) {
+    const item = dishes.find(d => d.id === id);
+
+    if (!item || quantity <= 0) continue;
+
+    total += item.price * quantity;
+
+    const line = document.createElement("div");
+    line.className = "cart-item";
+
+    const name = document.createElement("span");
+    name.textContent = item.name + " × " + quantity;
+
+    const controls = document.createElement("div");
+
+    const minus = document.createElement("button");
+    minus.textContent = "−";
+    minus.onclick = () => {
+      if (quantity <= 1) {
+        cart.delete(id);
+      } else {
+        cart.set(id, quantity - 1);
+      }
+      renderCart();
+    };
+
+    const plus = document.createElement("button");
+    plus.textContent = "+";
+    plus.onclick = () => {
+      cart.set(id, quantity + 1);
+      renderCart();
+    };
+
+    const subtotal = document.createElement("span");
+    subtotal.textContent = " " + money(item.price * quantity) + " ";
+
+    controls.append(minus, subtotal, plus);
+    line.append(name, controls);
+
+    $("cartItems").appendChild(line);
+  }
+
+  $("total").textContent = money(total);
+  $("send").disabled = sending || total === 0;
+}
+
+// Тапсырысты SQLite базасына жіберу
+async function sendOrder() {
+  if (!validCabin || sending) return;
+
+  const customerName = $("customer").value.trim();
+
+  if (!customerName) {
+    $("result").textContent = "Атыңызды жазыңыз!";
+    return;
+  }
+
+  const orderItems = [];
+
+  for (const [id, quantity] of cart) {
+    const item = dishes.find(d => d.id === id);
+
+    if (!item) continue;
+
+    for (let i = 0; i < quantity; i++) {
+      orderItems.push(item);
+    }
+  }
+
+  if (!orderItems.length) return;
+
+  sending = true;
+  renderCart();
+
+  let completed = 0;
+  let errorMessage = "";
+
+  for (const item of orderItems) {
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          customer_name: customerName,
+          dish: item.name,
+          cafe_id: 1,
+          cabin_number: cabin
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Тапсырыс сақталмады"
+        );
+      }
+
+      completed++;
+
+      const remaining = (cart.get(item.id) || 0) - 1;
+
+      if (remaining <= 0) {
+        cart.delete(item.id);
+      } else {
+        cart.set(item.id, remaining);
+      }
+
+    } catch (error) {
+      errorMessage = error.message;
+      break;
+    }
+  }
+
+  sending = false;
+  renderCart();
+
+  if (errorMessage) {
+    $("result").textContent =
+      completed + " тағам сақталды. Қате: " +
+      errorMessage;
+  } else {
+    $("result").textContent =
+      "Тапсырыс қабылданды! Кабинка №" + cabin;
+  }
+}
+
+renderCart();
+</script>
+
+</body>
+</html>
