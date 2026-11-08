@@ -58,6 +58,24 @@ def init_db():
                 password_hash TEXT NOT NULL
             )
         """)
+        
+        # Volidam кафесінің 6 жеке кабинкасы
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS cabins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                cafe_id INTEGER NOT NULL,
+                cabin_number INTEGER NOT NULL,
+                UNIQUE(cafe_id, cabin_number)
+            )
+        """)
+
+        for number in range(1, 7):
+            db.execute("""
+                INSERT OR IGNORE INTO cabins
+                (cafe_id, cabin_number)
+                VALUES (?, ?)
+            """, (1, number))
+
 
         
         if db.execute("SELECT COUNT(*) FROM menu").fetchone()[0] == 0:
@@ -311,6 +329,24 @@ def get_cafes():
         ).fetchall()
 
     return jsonify([dict(cafe) for cafe in cafes])
+    
+@app.route("/api/cabins", methods=["GET"])
+def get_cabins():
+    cafe_id = request.args.get("cafe_id", type=int)
+
+    if cafe_id is None:
+        return jsonify({"error": "Кафе ID қажет"}), 400
+
+    with get_db() as db:
+        cabins = db.execute("""
+            SELECT id, cafe_id, cabin_number
+            FROM cabins
+            WHERE cafe_id = ?
+            ORDER BY cabin_number
+        """, (cafe_id,)).fetchall()
+
+    return jsonify([dict(cabin) for cabin in cabins])
+
 
     
 
