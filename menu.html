@@ -135,6 +135,24 @@ function renderFoods() {
 
     const title = document.createElement('h3');
     title.textContent = d.name;
+    const img = document.createElement('img');
+
+if (d.name.toLowerCase().includes('окорочка')) {
+  img.src = 'okorochka.jpeg';
+} else if (
+  d.name.toLowerCase().includes('кусковой') ||
+  d.name.toLowerCase().includes('фарш')
+) {
+  img.src = 'shashlyk.jpeg';
+}
+
+if (img.src && img.getAttribute('src')) {
+  img.style.width = '100%';
+  img.style.height = '190px';
+  img.style.objectFit = 'cover';
+  img.style.borderRadius = '12px';
+  card.append(img);
+}
 
     const price = document.createElement('div');
     price.className = 'price';
