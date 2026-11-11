@@ -99,20 +99,23 @@ def init_db():
 
 
         
-        if db.execute("SELECT COUNT(*) FROM menu").fetchone()[0] == 0:
-            db.executemany(
-                "INSERT INTO menu (name, price) VALUES (?, ?)",
-                [
-                    ("Бешбармак", 3500),
-                    ("Лагман", 2200),
-                    ("Цезарь с курицей", 2400),
-                    ("Самса", 700),
-                    ("Шұбат", 900),
-                    ("Чай с лимоном", 800),
-                    ("Палау", 1800),
-                    ("Манты", 2300)
-                ]
-            )
+        # Volidam menu migration. Do not erase historical orders.
+        columns = {r["name"] for r in db.execute("PRAGMA table_info(menu)")}
+        if "category" not in columns:
+            db.execute("ALTER TABLE menu ADD COLUMN category TEXT NOT NULL DEFAULT 'Тағамдар'")
+        db.execute("CREATE TABLE IF NOT EXISTS app_migrations (name TEXT PRIMARY KEY)")
+        if not db.execute("SELECT 1 FROM app_migrations WHERE name = ?", ("volidam_menu_v1",)).fetchone():
+            # Only remove the original eight demo items, leaving other custom rows intact.
+            old_demo = ["Бешбармак", "Лагман", "Цезарь с курицей", "Самса", "Шұбат", "Чай с лимоном", "Палау", "Манты"]
+            db.executemany("DELETE FROM menu WHERE name = ?", [(x,) for x in old_demo])
+            new_items = [('Мясной ассорти', 5000, 'Ассорти'), ('Фруктовое ассорти', 4000, 'Ассорти'), ('Чикен', 2500, 'Ассорти'), ('Острый', 1700, 'Салаттар'), ('Цезарь', 1700, 'Салаттар'), ('Хрустящие баклажаны', 1900, 'Салаттар'), ('Фруктовый', 1700, 'Салаттар'), ('Свежий', 1100, 'Салаттар'), ('Ачичук', 1100, 'Салаттар'), ('Мужской каприз', 1700, 'Салаттар'), ('Кусковой', 700, 'Шашлық'), ('Фарш', 700, 'Шашлық'), ('Окорочка (крылышки)', 950, 'Шашлық'), ('Кабырга', 3500, 'Шашлық'), ('Кола 1 л', 700, 'Сусындар'), ('Кола 1,5 л', 850, 'Сусындар'), ('Пепси 1 л', 700, 'Сусындар'), ('Пепси 1,2 л', 850, 'Сусындар'), ('Макси чай', 700, 'Сусындар'), ('Спрайт', 700, 'Сусындар'), ('Фанта', 700, 'Сусындар'), ('Пико морс', 850, 'Сусындар'), ('Фьюсти чай', 700, 'Сусындар'), ('Махито (кувшин)', 1800, 'Сусындар'), ('Зеленый чай', 350, 'Сусындар'), ('Черный чай', 350, 'Сусындар'), ('Ташкентский чай', 450, 'Сусындар'), ('Кофе', 150, 'Сусындар'), ('DIZZY', 450, 'Сусындар'), ('GORILLA', 450, 'Сусындар')]
+            for name, price, category in new_items:
+                existing = db.execute("SELECT id FROM menu WHERE name = ?", (name,)).fetchone()
+                if existing:
+                    db.execute("UPDATE menu SET price = ?, category = ? WHERE id = ?", (price, category, existing["id"]))
+                else:
+                    db.execute("INSERT INTO menu (name, price, category) VALUES (?, ?, ?)", (name, price, category))
+            db.execute("INSERT INTO app_migrations (name) VALUES (?)", ("volidam_menu_v1",))
 
 init_db()
 
