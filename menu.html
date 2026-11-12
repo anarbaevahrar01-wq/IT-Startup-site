@@ -418,7 +418,10 @@ function renderFoods() {
     content.className = "food-content";
 
     const title = document.createElement("h3");
-    title.textContent = d.name;
+    title.textContent = d.name.toLowerCase().includes("пепси") &&
+                    d.name.includes("1,2")
+  ? "Пепси 1,5 л"
+  : d.name;
 
     const price = document.createElement("div");
     price.className = "price";
