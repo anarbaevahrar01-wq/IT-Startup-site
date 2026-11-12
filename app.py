@@ -1,6 +1,7 @@
 
-from flask import Flask, jsonify, request, send_from_directory, session
+from flask import Flask, jsonify, request, send_from_directory, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
+from authlib.integrations.flask_client import OAuth
 import sqlite3
 import os
 app = Flask(__name__)
@@ -10,6 +11,16 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "local-development-only"
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("RENDER") == "true"
+# Google OAuth
+oauth = OAuth(app)
+
+google = oauth.register(
+    name="google",
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"}
+)
 
 def get_db():
     db = sqlite3.connect(DB_PATH)
@@ -402,6 +413,52 @@ def get_cabins():
         """, (cafe_id,)).fetchall()
 
     return jsonify([dict(cabin) for cabin in cabins])
+    # ---------- GOOGLE АРҚЫЛЫ КІРУ ----------
+
+@app.route("/auth/google")
+def google_login():
+    redirect_uri = url_for(
+        "google_callback",
+        _external=True,
+        _scheme="https"
+    )
+    return google.authorize_redirect(redirect_uri)
+
+
+@app.route("/auth/google/callback")
+def google_callback():
+    token = google.authorize_access_token()
+    user_info = token.get("userinfo")
+
+    if not user_info or not user_info.get("email_verified"):
+        return "Google аккаунтын тексеру мүмкін болмады", 400
+
+    email = user_info["email"].lower()
+    name = user_info.get("name", "Google User")
+
+    with get_db() as db:
+        user = db.execute(
+            "SELECT id FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+
+        if user:
+            user_id = user["id"]
+        else:
+            cursor = db.execute(
+                "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+                (
+                    name,
+                    email,
+                    generate_password_hash(os.urandom(32).hex())
+                )
+            )
+            user_id = cursor.lastrowid
+
+    session.clear()
+    session["user_id"] = user_id
+
+    return redirect("/index.html")
 
 
     
