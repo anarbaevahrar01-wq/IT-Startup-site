@@ -388,10 +388,21 @@ function renderFoods() {
   filtered.forEach(d => {
     const card = document.createElement("div");
     card.className = "food";
-    const photoName =
-  d.name.toLowerCase().includes("пепси")
-    ? "pepsi.jpeg"
-    : photos[d.name];
+    const name = d.name.toLowerCase().replace(/\s/g, "");
+
+let photoName = photos[d.name];
+
+if (name.includes("пепси")) {
+  photoName = name.includes("1,5") || name.includes("1.5")
+    ? "pepsi1,5.jpeg"
+    : "pepsi.jpeg";
+}
+
+if (name.includes("кола")) {
+  photoName = name.includes("1,5") || name.includes("1.5")
+    ? "cola1,5.jpeg"
+    : "cola.jpeg";
+}
 
     const placeholder = document.createElement("div");
     placeholder.className = "no-photo";
