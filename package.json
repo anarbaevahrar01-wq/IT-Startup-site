@@ -1,0 +1,36 @@
+{
+  "name": "qrdine",
+  "version": "2.0.0",
+  "private": true,
+  "description": "QR DINE — QR-меню и онлайн-заказы для кафе. Стек: Node.js + Express 5 + htmx + SQLite.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "imports": {
+    "#src/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/server.js",
+    "start": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/server.js",
+    "db:reset": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning scripts/reset-db.js",
+    "brand": "node scripts/generate-brand.js",
+    "test": "node --disable-warning=ExperimentalWarning --test"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.1.0",
+    "@fontsource-variable/montserrat": "^5.1.0",
+    "compression": "^1.8.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "htmx.org": "^2.0.4",
+    "multer": "^2.0.0",
+    "nunjucks": "^3.2.4",
+    "qrcode": "^1.5.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}

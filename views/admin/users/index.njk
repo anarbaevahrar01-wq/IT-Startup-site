@@ -1,0 +1,18 @@
+{% extends "layouts/admin.njk" %}
+
+{% block content %}
+<section class="panel">
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Пайдаланушы</th><th>Рөлі</th><th>Тапсырыстар</th><th>Тіркелген</th><th class="table__actions"></th></tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          {% include "admin/users/_row.njk" %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

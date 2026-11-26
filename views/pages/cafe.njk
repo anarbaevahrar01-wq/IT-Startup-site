@@ -1,0 +1,59 @@
+{% extends "layouts/site.njk" %}
+
+{% block content %}
+
+{# ---------- Обложка кафе ---------- #}
+<section class="cafe-hero" {% if cafe.cover_url %}style="--cover: url('{{ cafe.cover_url }}')"{% endif %}>
+  <div class="container cafe-hero__inner">
+    <a class="back-link" href="/#cafes">{{ icon('arrow-left') }} Барлық кафелер</a>
+    <h1 class="cafe-hero__title">{{ cafe.name }}</h1>
+    {% if cafe.tagline %}<p class="cafe-hero__tagline">{{ cafe.tagline }}</p>{% endif %}
+
+    <ul class="cafe-hero__meta">
+      {% if cafe.address %}<li>{{ icon('pin') }} {{ cafe.address }}</li>{% endif %}
+      {% if cafe.hours %}<li>{{ icon('clock') }} {{ cafe.hours }}</li>{% endif %}
+      {% if cafe.phone %}<li><a href="tel:{{ cafe.phone | replace(' ', '') }}">{{ icon('phone') }} {{ cafe.phone }}</a></li>{% endif %}
+      {% if cafe.instagram %}<li><a href="https://instagram.com/{{ cafe.instagram }}" target="_blank" rel="noopener">{{ icon('instagram') }} @{{ cafe.instagram }}</a></li>{% endif %}
+    </ul>
+
+    {% if table %}
+      <div class="table-pill">{{ icon('qr') }} Сіз <strong>№{{ table.number }}</strong> үстелдесіз{% if table.label %} · {{ table.label }}{% endif %}</div>
+    {% endif %}
+  </div>
+</section>
+
+{# ---------- Меню ---------- #}
+<section class="container menu-layout">
+  <div class="menu-toolbar">
+    <nav class="chips" aria-label="Санаттар">
+      {% for category in categories %}
+        <a class="chip" href="#cat-{{ category.id }}">{{ category.name }}</a>
+      {% endfor %}
+    </nav>
+
+    {# Живой поиск: htmx запрашивает отфильтрованное меню после паузы в наборе #}
+    <label class="search-field">
+      {{ icon('search') }}
+      <input type="search" name="q" placeholder="Мәзірден іздеу…" autocomplete="off"
+             hx-get="/cafes/{{ cafe.slug }}/menu"
+             hx-trigger="input changed delay:300ms, search"
+             hx-target="#menu-sections"
+             hx-swap="outerHTML"
+             hx-indicator="#menu-loading">
+      <span id="menu-loading" class="spinner htmx-indicator" aria-hidden="true"></span>
+    </label>
+  </div>
+
+  {% include "fragments/menu-sections.njk" %}
+
+  {% if cafe.description %}
+    <aside class="about-card">
+      <h2>{{ cafe.name }} туралы</h2>
+      <p>{{ cafe.description }}</p>
+    </aside>
+  {% endif %}
+</section>
+
+{% include "fragments/cart-bar.njk" %}
+
+{% endblock %}

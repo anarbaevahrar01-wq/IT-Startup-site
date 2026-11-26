@@ -1,0 +1,45 @@
+<footer class="site-footer">
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      {{ logo({ tagline: true, className: 'logo logo--on-dark' }) }}
+      <p>Кафе мен мейрамханаларға арналған QR-мәзір және онлайн тапсырыс жүйесі. Түркістан, Қазақстан.</p>
+    </div>
+
+    <div>
+      <h3 class="site-footer__title">Навигация</h3>
+      <ul class="site-footer__links">
+        <li><a href="/#cafes">Кафелер</a></li>
+        <li><a href="/#how">Қалай жұмыс істейді</a></li>
+        <li><a href="/#business">Бизнеске</a></li>
+        <li><a href="/contacts">Байланыс</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="site-footer__title">Аккаунт</h3>
+      <ul class="site-footer__links">
+        {% if currentUser %}
+          <li><a href="/account">Жеке кабинет</a></li>
+        {% else %}
+          <li><a href="/login">Кіру</a></li>
+          <li><a href="/register">Тіркелу</a></li>
+        {% endif %}
+        <li><a href="/cart">Себет</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="site-footer__title">Байланыс</h3>
+      <ul class="site-footer__links">
+        <li>{{ icon('pin') }} Түркістан қ.</li>
+        <li><a href="https://wa.me/77058976616" target="_blank" rel="noopener">{{ icon('message') }} WhatsApp</a></li>
+        <li><a href="/contacts#partner">{{ icon('inbox') }} Серіктес болу</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container site-footer__bottom">
+    <span>© {{ year }} QR DINE. Барлық құқықтар қорғалған.</span>
+    <span>Scan • Order • Enjoy</span>
+  </div>
+</footer>

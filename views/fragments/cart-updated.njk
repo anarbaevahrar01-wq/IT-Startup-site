@@ -1,0 +1,9 @@
+{#
+  Ответ на «добавить в корзину». Основное содержимое не вставляется
+  (hx-swap="none"), работают только out-of-band обновления:
+  счётчик в шапке, счётчик на карточке, панель корзины и уведомление.
+#}
+<span id="cart-count" class="cart-button__count" hx-swap-oob="true">{{ count }}</span>
+<span id="qty-{{ item.id }}" class="add-button__qty is-bumped" hx-swap-oob="true">{{ quantity }}</span>
+{% include "fragments/cart-bar.njk" %}
+{% include "fragments/toast.njk" %}

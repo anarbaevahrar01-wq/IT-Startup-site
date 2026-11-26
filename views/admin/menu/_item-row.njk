@@ -1,0 +1,31 @@
+{# Строка позиции меню: переключатель «в меню» и удаление работают через htmx #}
+<tr id="item-{{ item.id }}" class="{% if not item.is_available %}is-muted{% endif %}">
+  <td>
+    <div class="media-cell">
+      {% if item.image_url %}
+        <img src="{{ item.image_url }}" alt="" width="44" height="44" loading="lazy">
+      {% else %}
+        <span class="media-cell__empty">{{ icon('utensils') }}</span>
+      {% endif %}
+      <div>
+        <strong>{{ item.name }}</strong>
+        {% if item.description %}<span class="muted block truncate">{{ item.description }}</span>{% endif %}
+      </div>
+    </div>
+  </td>
+  <td>{{ item.category_name or '—' }}</td>
+  <td><strong>{{ item.price | money }}</strong></td>
+  <td>
+    <button class="switch {% if item.is_available %}is-on{% endif %}" type="button" role="switch"
+            aria-checked="{{ 'true' if item.is_available else 'false' }}" aria-label="Мәзірде көрсету"
+            hx-post="/admin/menu/{{ item.id }}/toggle" hx-target="#item-{{ item.id }}" hx-swap="outerHTML">
+      <span class="switch__thumb"></span>
+    </button>
+  </td>
+  <td class="table__actions">
+    <a class="icon-button" href="/admin/menu/{{ item.id }}/edit" aria-label="Өңдеу">{{ icon('edit') }}</a>
+    <button class="icon-button icon-button--danger" type="button" aria-label="Жою"
+            hx-delete="/admin/menu/{{ item.id }}" hx-target="#item-{{ item.id }}" hx-swap="outerHTML swap:200ms"
+            hx-confirm="«{{ item.name }}» мәзірден жойылсын ба?">{{ icon('trash') }}</button>
+  </td>
+</tr>

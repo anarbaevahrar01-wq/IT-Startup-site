@@ -1,0 +1,57 @@
+{% extends "layouts/admin.njk" %}
+
+{% block content %}
+{% set tabs = [
+  { key: 'active', label: 'Белсенді', count: (counts.new or 0) + (counts.preparing or 0) + (counts.ready or 0) },
+  { key: 'new', label: 'Жаңа', count: counts.new },
+  { key: 'preparing', label: 'Дайындалуда', count: counts.preparing },
+  { key: 'ready', label: 'Дайын', count: counts.ready },
+  { key: 'completed', label: 'Аяқталды', count: counts.completed },
+  { key: 'cancelled', label: 'Бас тартылды', count: counts.cancelled },
+  { key: 'all', label: 'Барлығы' }
+] %}
+{% set baseQuery = ('&cafe=' + filters.cafeId if filters.cafeId else '') + ('&q=' + filters.search | urlencode if filters.search else '') %}
+
+<section class="panel">
+  <div class="toolbar">
+    <nav class="tabs" aria-label="Мәртебе бойынша сүзгі">
+      {% for tab in tabs %}
+        <a class="tabs__item {% if filters.status == tab.key %}is-active{% endif %}" href="/admin/orders?status={{ tab.key }}{{ baseQuery }}">
+          {{ tab.label }}{% if tab.count %} <span class="tabs__count">{{ tab.count }}</span>{% endif %}
+        </a>
+      {% endfor %}
+    </nav>
+
+    {# Обычная GET-форма: hx-boost отправит её без перезагрузки и обновит адрес #}
+    <form class="toolbar__filters" action="/admin/orders" method="get">
+      <input type="hidden" name="status" value="{{ filters.status }}">
+      {% if cafes.length > 1 %}
+        <select class="input input--sm" name="cafe" data-autosubmit aria-label="Кафе">
+          <option value="">Барлық кафе</option>
+          {% for cafe in cafes %}<option value="{{ cafe.id }}" {% if cafe.id == filters.cafeId %}selected{% endif %}>{{ cafe.name }}</option>{% endfor %}
+        </select>
+      {% endif %}
+      <label class="search-field search-field--sm">
+        {{ icon('search') }}
+        <input type="search" name="q" value="{{ filters.search }}" placeholder="Код, аты, телефон">
+      </label>
+    </form>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Код</th><th>Уақыт</th><th>Үстел</th><th>Қонақ</th><th>Сома</th><th>Мәртебе</th><th class="table__actions"></th>
+        </tr>
+      </thead>
+      {# Тело таблицы обновляется каждые 10 секунд с текущими фильтрами #}
+      <tbody id="orders-rows"
+             hx-get="/admin/orders/rows?status={{ filters.status }}{{ baseQuery }}"
+             hx-trigger="every 10s" hx-swap="innerHTML">
+        {% include "admin/orders/_rows.njk" %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{# Карточка заявки: смена статуса и удаление через htmx #}
+<article id="application-{{ application.id }}" class="panel application application--{{ application.status }}">
+  <div class="panel__body">
+    <header class="application__head">
+      <div>
+        <h2>{{ application.cafe_name }}</h2>
+        <span class="muted">{{ application.created_at | datetime }}</span>
+      </div>
+      <span class="status status--app-{{ application.status }}">{{ APPLICATION_STATUSES[application.status].label }}</span>
+    </header>
+
+    <ul class="meta-list">
+      <li>{{ icon('user') }} {{ application.contact_name }}</li>
+      <li><a href="tel:{{ application.phone | replace(' ', '') }}">{{ icon('phone') }} {{ application.phone }}</a></li>
+      {% if application.email %}<li><a href="mailto:{{ application.email }}">{{ icon('message') }} {{ application.email }}</a></li>{% endif %}
+    </ul>
+    {% if application.message %}<p class="note">{{ application.message }}</p>{% endif %}
+
+    <footer class="application__actions">
+      <form hx-post="/admin/applications/{{ application.id }}/status" hx-trigger="change" hx-target="#application-{{ application.id }}" hx-swap="outerHTML">
+        <select class="input input--sm" name="status" aria-label="Мәртебе">
+          {% for key, status in APPLICATION_STATUSES %}
+            <option value="{{ key }}" {% if key == application.status %}selected{% endif %}>{{ status.label }}</option>
+          {% endfor %}
+        </select>
+      </form>
+      <button class="icon-button icon-button--danger" type="button" aria-label="Жою"
+              hx-delete="/admin/applications/{{ application.id }}" hx-target="#application-{{ application.id }}" hx-swap="outerHTML"
+              hx-confirm="Өтінімді жою керек пе?">{{ icon('trash') }}</button>
+    </footer>
+  </div>
+</article>

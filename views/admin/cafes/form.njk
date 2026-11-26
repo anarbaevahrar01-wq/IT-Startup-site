@@ -1,0 +1,103 @@
+{% extends "layouts/admin.njk" %}
+{% from "partials/form.njk" import field_error, form_error %}
+
+{% block breadcrumbs %}<a class="back-link" href="/admin/cafes">{{ icon('arrow-left') }} Кафелер</a>{% endblock %}
+
+{% block actions %}
+  {% if cafe %}
+    <a class="btn btn--ghost btn--sm" href="/cafes/{{ cafe.slug }}" target="_blank" hx-boost="false">{{ icon('external') }} <span class="hide-mobile">Бетті ашу</span></a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<form class="form-layout" action="{{ '/admin/cafes/' + cafe.id if cafe else '/admin/cafes' }}" method="post" enctype="multipart/form-data" novalidate>
+  <section class="panel">
+    <header class="panel__head"><h2>Кафе туралы</h2></header>
+    <div class="panel__body">
+      {{ form_error(errors) }}
+      <div class="form-row">
+        <label class="field">
+          <span class="field__label">Атауы *</span>
+          <input class="input" name="name" required maxlength="80" value="{{ values.name }}">
+          {{ field_error(errors, 'name') }}
+        </label>
+        <label class="field">
+          <span class="field__label">Сайттағы адрес *</span>
+          <span class="input-prefix"><span>/cafes/</span><input class="input" name="slug" required maxlength="40" pattern="[a-z0-9-]+" value="{{ values.slug }}" placeholder="volidam"></span>
+          {{ field_error(errors, 'slug') }}
+        </label>
+      </div>
+      <label class="field">
+        <span class="field__label">Қысқаша сипаттама</span>
+        <input class="input" name="tagline" maxlength="120" value="{{ values.tagline }}" placeholder="Шығыс асханасы • Түркістан">
+      </label>
+      <label class="field">
+        <span class="field__label">Толық сипаттама</span>
+        <textarea class="input" name="description" rows="4" maxlength="1000">{{ values.description }}</textarea>
+      </label>
+      <div class="form-row">
+        <label class="field">
+          <span class="field__label">Мекенжай</span>
+          <input class="input" name="address" maxlength="160" value="{{ values.address }}">
+        </label>
+        <label class="field">
+          <span class="field__label">Жұмыс уақыты</span>
+          <input class="input" name="hours" maxlength="60" value="{{ values.hours }}" placeholder="11:00–00:00">
+        </label>
+      </div>
+      <div class="form-row">
+        <label class="field">
+          <span class="field__label">Телефон</span>
+          <input class="input" name="phone" maxlength="30" value="{{ values.phone }}">
+        </label>
+        <label class="field">
+          <span class="field__label">Instagram</span>
+          <input class="input" name="instagram" maxlength="60" value="{{ values.instagram }}" placeholder="volidam_kafe">
+        </label>
+      </div>
+      <label class="checkbox">
+        <input type="checkbox" name="is_active" value="1" {% if values.is_active and values.is_active != '0' %}checked{% endif %}>
+        <span>Сайтта көрсету</span>
+      </label>
+    </div>
+  </section>
+
+  <aside class="stack">
+    <section class="panel">
+      <header class="panel__head"><h2>Мұқаба суреті</h2></header>
+      <div class="panel__body">
+        <label class="upload upload--wide">
+          <img class="upload__preview {% if not values.cover_url %}is-hidden{% endif %}" src="{{ values.cover_url or '' }}" alt="" data-preview-target>
+          <span class="upload__placeholder">{{ icon('image') }} Суретті таңдаңыз</span>
+          <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" data-preview>
+        </label>
+        {{ field_error(errors, 'image') }}
+        {% if cafe and cafe.cover_url %}
+          <label class="checkbox"><input type="checkbox" name="remove_image" value="1"> <span>Суретті жою</span></label>
+        {% endif %}
+      </div>
+    </section>
+    <div class="form-actions">
+      <button class="btn btn--primary btn--block" type="submit">{{ icon('check') }} Сақтау</button>
+    </div>
+  </aside>
+</form>
+
+{% if cafe %}
+  {# ---------- Столы и QR-коды ---------- #}
+  {% include "admin/cafes/_tables.njk" %}
+
+  <section class="panel panel--danger">
+    <div class="panel__body danger-zone">
+      <div>
+        <h2>Кафені жою</h2>
+        <p class="muted">Мәзір, үстелдер және барлық тапсырыстар біржола жойылады.</p>
+      </div>
+      <button class="btn btn--danger" type="button" hx-delete="/admin/cafes/{{ cafe.id }}"
+              hx-confirm="«{{ cafe.name }}» кафесін барлық деректерімен жою керек пе? Бұл әрекетті қайтару мүмкін емес.">
+        {{ icon('trash') }} Жою
+      </button>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

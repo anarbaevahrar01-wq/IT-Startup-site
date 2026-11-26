@@ -1,0 +1,31 @@
+{# Столы кафе. Каждому столу — свой QR-код со ссылкой /t/<slug>/<номер>. #}
+<section id="tables" class="panel">
+  <header class="panel__head">
+    <h2>Үстелдер және QR-кодтар <span class="muted">{{ tables.length }}</span></h2>
+    <a class="btn btn--outline btn--sm" href="/admin/cafes/{{ cafe.id }}/qr-print" target="_blank" hx-boost="false">{{ icon('printer') }} Барлығын басып шығару</a>
+  </header>
+
+  <div class="panel__body">
+    <div class="table-cards">
+      {% for table in tables %}
+        <div class="table-card">
+          <span class="table-card__num">№{{ table.number }}</span>
+          {% if table.label %}<span class="muted">{{ table.label }}</span>{% endif %}
+          <code class="table-card__url">/t/{{ cafe.slug }}/{{ table.number }}</code>
+          <div class="table-card__actions">
+            <a class="icon-button" href="/admin/cafes/{{ cafe.id }}/tables/{{ table.id }}/qr.svg" hx-boost="false" download aria-label="QR жүктеу">{{ icon('download') }}</a>
+            <a class="icon-button" href="/t/{{ cafe.slug }}/{{ table.number }}" target="_blank" hx-boost="false" aria-label="Тексеру">{{ icon('external') }}</a>
+            <button class="icon-button icon-button--danger" type="button" aria-label="Жою"
+                    hx-delete="/admin/cafes/{{ cafe.id }}/tables/{{ table.id }}" hx-target="#tables" hx-swap="outerHTML"
+                    hx-confirm="№{{ table.number }} үстелді жою керек пе?">{{ icon('trash') }}</button>
+          </div>
+        </div>
+      {% endfor %}
+
+      <form class="table-card table-card--add" hx-post="/admin/cafes/{{ cafe.id }}/tables" hx-target="#tables" hx-swap="outerHTML">
+        <input class="input input--sm" name="label" maxlength="40" placeholder="Белгі (міндетті емес)">
+        <button class="btn btn--primary btn--sm btn--block" type="submit">{{ icon('plus') }} Үстел қосу</button>
+      </form>
+    </div>
+  </div>
+</section>

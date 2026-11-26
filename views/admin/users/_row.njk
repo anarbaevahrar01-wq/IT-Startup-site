@@ -1,0 +1,27 @@
+{% set isSelf = user.id == currentUser.id %}
+<tr id="user-{{ user.id }}">
+  <td>
+    <div class="media-cell">
+      <span class="avatar">{{ user.name | initials }}</span>
+      <div>
+        <strong>{{ user.name }}{% if isSelf %} <span class="muted">(сіз)</span>{% endif %}</strong>
+        <span class="muted block">{{ user.email }}</span>
+      </div>
+    </div>
+  </td>
+  <td><span class="status {{ 'status--preparing' if user.role == 'admin' else 'status--completed' }}">{{ 'Әкімші' if user.role == 'admin' else 'Қонақ' }}</span></td>
+  <td>{{ user.orders_count }}</td>
+  <td>{{ user.created_at | datetime }}</td>
+  <td class="table__actions">
+    {% if not isSelf %}
+      <button class="btn btn--ghost btn--sm" type="button"
+              hx-post="/admin/users/{{ user.id }}/role" hx-target="#user-{{ user.id }}" hx-swap="outerHTML"
+              hx-confirm="{{ user.name }} рөлін өзгерту керек пе?">
+        {{ 'Әкімшіліктен алу' if user.role == 'admin' else 'Әкімші ету' }}
+      </button>
+      <button class="icon-button icon-button--danger" type="button" aria-label="Жою"
+              hx-delete="/admin/users/{{ user.id }}" hx-target="#user-{{ user.id }}" hx-swap="outerHTML"
+              hx-confirm="{{ user.name }} аккаунтын жою керек пе?">{{ icon('trash') }}</button>
+    {% endif %}
+  </td>
+</tr>

@@ -1,0 +1,10 @@
+{# Плавающая панель корзины внизу страницы меню. oob=true — для обновления через hx-swap-oob. #}
+<div id="cart-bar" class="cart-bar {% if not cart or cart.isEmpty %}is-hidden{% endif %}" {% if oob %}hx-swap-oob="true"{% endif %}>
+  {% if cart and not cart.isEmpty %}
+    <a class="cart-bar__inner" href="/cart">
+      <span class="cart-bar__icon">{{ icon('cart') }}<span>{{ cart.count }}</span></span>
+      <span class="cart-bar__label">Себетті ашу</span>
+      <strong class="cart-bar__total">{{ cart.total | money }}</strong>
+    </a>
+  {% endif %}
+</div>

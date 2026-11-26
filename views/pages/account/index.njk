@@ -1,0 +1,43 @@
+{% extends "layouts/site.njk" %}
+
+{% block content %}
+<section class="page-head page-head--compact">
+  <div class="container page-head__row">
+    <div class="profile">
+      <span class="avatar avatar--lg">{{ currentUser.name | initials }}</span>
+      <div>
+        <h1>{{ currentUser.name }}</h1>
+        <p class="muted">{{ currentUser.email }}</p>
+      </div>
+    </div>
+    <form action="/logout" method="post">
+      <button class="btn btn--outline" type="submit">{{ icon('logout') }} Шығу</button>
+    </form>
+  </div>
+</section>
+
+<section class="container section section--flush-top">
+  <h2 class="section-title section-title--sm">Менің тапсырыстарым</h2>
+  {% if orders.length %}
+    <div class="order-list">
+      {% for order in orders %}
+        <a class="card order-row" href="/orders/{{ order.code }}">
+          <span class="order-code">{{ order.code }}</span>
+          <span>
+            <strong>{{ order.cafe_name }}</strong>
+            <span class="muted">{{ order.created_at | datetime }} · {{ order.items_count }} дана</span>
+          </span>
+          <span class="status status--{{ order.status }}">{{ ORDER_STATUSES[order.status].label }}</span>
+          <strong>{{ order.total | money }}</strong>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      {{ icon('receipt') }}
+      <p>Әзірге тапсырыстар жоқ.</p>
+      <a class="btn btn--primary" href="/#cafes">Кафені таңдау</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

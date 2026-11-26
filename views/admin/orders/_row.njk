@@ -1,0 +1,25 @@
+{#
+  Строка заказа. Выбор статуса сразу отправляется на сервер (hx-trigger="change"),
+  а ответ — обновлённая строка — заменяет текущую.
+#}
+<tr id="order-{{ order.id }}" class="{% if order.status == 'new' %}is-highlight{% endif %}">
+  <td><a class="order-code" href="/admin/orders/{{ order.id }}">{{ order.code }}</a></td>
+  <td><span title="{{ order.created_at | datetime }}">{{ order.created_at | ago }}</span></td>
+  <td><span class="table-badge">№{{ order.table_number or '—' }}</span></td>
+  <td>
+    <strong>{{ order.customer_name }}</strong>
+    <span class="muted block">{{ order.cafe_name }} · {{ order.items_count }} дана</span>
+  </td>
+  <td><strong>{{ order.total | money }}</strong></td>
+  <td>
+    <form hx-post="/admin/orders/{{ order.id }}/status" hx-trigger="change" hx-target="#order-{{ order.id }}" hx-swap="outerHTML">
+      <input type="hidden" name="from" value="row">
+      <select class="status-select status--{{ order.status }}" name="status" aria-label="Мәртебе">
+        {% for key, status in ORDER_STATUSES %}
+          <option value="{{ key }}" {% if key == order.status %}selected{% endif %}>{{ status.label }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </td>
+  <td class="table__actions"><a class="icon-button" href="/admin/orders/{{ order.id }}" aria-label="Толығырақ">{{ icon('eye') }}</a></td>
+</tr>

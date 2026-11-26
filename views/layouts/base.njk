@@ -1,0 +1,45 @@
+{#
+  Базовый HTML-каркас для всех страниц (сайт, админка, печать).
+  hx-boost на <body> превращает обычные ссылки и формы в AJAX-переходы:
+  страница не перезагружается целиком, но адреса и кнопка «Назад» работают.
+#}
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% if title %}{{ title }} — {% endif %}QR DINE</title>
+  <meta name="description" content="{{ description or 'QR DINE — QR-код арқылы мәзірді ашып, даяшыны күтпей тапсырыс беріңіз.' }}">
+  <meta name="theme-color" content="#0A3A2D">
+
+  <meta property="og:title" content="{{ title or 'QR DINE' }}">
+  <meta property="og:description" content="Сканерле. Тапсырыс бер. Ләззат ал.">
+  <meta property="og:image" content="{{ baseUrl }}/icons/og-image.png">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  {# Настройки htmx: ответы 422 (ошибки валидации) тоже вставляются на страницу #}
+  <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true},{"code":"[45]..","swap":false,"error":true}],"includeIndicatorStyles":false,"historyCacheSize":0,"scrollIntoViewOnBoost":false}'>
+
+  <link rel="stylesheet" href="/vendor/inter/index.css">
+  <link rel="stylesheet" href="/vendor/montserrat/index.css">
+  <link rel="stylesheet" href="/css/app.css?v={{ assetVersion }}">
+  {% block styles %}{% endblock %}
+
+  <script src="/vendor/htmx/htmx.min.js" defer></script>
+  <script src="/js/app.js?v={{ assetVersion }}" defer></script>
+</head>
+<body class="{% block bodyClass %}{% endblock %}" hx-boost="true">
+  {% block body %}{% endblock %}
+
+  {# Контейнер уведомлений: сюда попадают flash-сообщения и toast из htmx-ответов #}
+  <div id="toasts" class="toasts" aria-live="polite">
+    {%- for item in flash %}
+    <div class="toast toast--{{ item.type }}" role="status">{{ item.message }}</div>
+    {%- endfor %}
+  </div>
+</body>
+</html>

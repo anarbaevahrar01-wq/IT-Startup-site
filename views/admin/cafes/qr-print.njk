@@ -1,0 +1,24 @@
+{# Страница печати QR-кодов: по карточке на стол, формат A4 (2×3 на лист) #}
+{% extends "layouts/base.njk" %}
+
+{% block bodyClass %}print-body{% endblock %}
+
+{% block body %}
+<div class="print-toolbar">
+  <a class="btn btn--ghost btn--sm" href="/admin/cafes/{{ cafe.id }}">{{ icon('arrow-left') }} Артқа</a>
+  <span>{{ cafe.name }} · {{ tables.length }} үстел</span>
+  <button class="btn btn--primary btn--sm" type="button" data-print>{{ icon('printer') }} Басып шығару</button>
+</div>
+
+<div class="print-sheet">
+  {% for table in tables %}
+    <article class="qr-tent">
+      <div class="qr-tent__logo">{{ logo({ className: 'logo' }) }}</div>
+      <p class="qr-tent__cafe">{{ cafe.name }}</p>
+      <div class="qr-tent__code">{{ table.svg | safe }}</div>
+      <p class="qr-tent__cta">Сканерле · Тапсырыс бер · Ләззат ал</p>
+      <p class="qr-tent__table">Үстел <strong>№{{ table.number }}</strong>{% if table.label %} · {{ table.label }}{% endif %}</p>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

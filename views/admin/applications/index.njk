@@ -1,0 +1,13 @@
+{% extends "layouts/admin.njk" %}
+
+{% block content %}
+{% if applications.length %}
+  <div class="application-grid">
+    {% for application in applications %}
+      {% include "admin/applications/_card.njk" %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="panel empty-state">{{ icon('inbox') }}<p>Өтінімдер әлі жоқ</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+{#
+  Содержимое корзины. Кнопки −/+ отправляют новое количество через htmx,
+  сервер возвращает этот же блок целиком (hx-swap="outerHTML").
+  При oob=true дополнительно обновляются счётчик в шапке и сумма в форме.
+#}
+<div id="cart-panel" class="card cart-panel">
+  {% if cart.isEmpty %}
+    <div class="empty-state">
+      {{ icon('cart') }}
+      <h2>Себет бос</h2>
+      <p>Мәзірден ұнаған тағамды таңдаңыз.</p>
+      <a class="btn btn--primary" href="{{ '/cafes/' + cart.cafe.slug if cart.cafe else '/#cafes' }}">Мәзірге өту</a>
+    </div>
+  {% else %}
+    <ul class="cart-lines">
+      {% for line in cart.lines %}
+        <li class="cart-line">
+          {% if line.item.image_url %}
+            <img class="cart-line__img" src="{{ line.item.image_url }}" alt="" width="64" height="64">
+          {% else %}
+            <span class="cart-line__img cart-line__img--empty">{{ icon('utensils') }}</span>
+          {% endif %}
+          <div class="cart-line__info">
+            <strong>{{ line.item.name }}</strong>
+            <span class="muted">{{ line.item.price | money }}</span>
+          </div>
+
+          <div class="stepper" role="group" aria-label="Саны">
+            {% for delta in [-1, 1] %}
+              <form action="/cart/items/{{ line.item.id }}" method="post"
+                    hx-post="/cart/items/{{ line.item.id }}" hx-target="#cart-panel" hx-swap="outerHTML">
+                <input type="hidden" name="quantity" value="{{ line.quantity + delta }}">
+                <button class="stepper__btn" type="submit" aria-label="{{ 'Азайту' if delta < 0 else 'Көбейту' }}">
+                  {{ icon('minus' if delta < 0 else 'plus') }}
+                </button>
+              </form>
+              {% if loop.first %}<span class="stepper__value">{{ line.quantity }}</span>{% endif %}
+            {% endfor %}
+          </div>
+
+          <strong class="cart-line__subtotal">{{ line.subtotal | money }}</strong>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="cart-summary">
+      <span>Барлығы · {{ cart.count }} дана</span>
+      <strong>{{ cart.total | money }}</strong>
+    </div>
+  {% endif %}
+</div>
+
+{% if oob %}
+  <span id="cart-count" class="cart-button__count {% if not count %}is-empty{% endif %}" hx-swap-oob="true">{{ count }}</span>
+  {% if cart.isEmpty %}
+    <div id="checkout" hx-swap-oob="true"></div>
+  {% else %}
+    <span id="checkout-total" hx-swap-oob="true">{{ cart.total | money }}</span>
+  {% endif %}
+{% endif %}

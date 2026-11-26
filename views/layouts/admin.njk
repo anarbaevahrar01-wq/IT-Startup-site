@@ -1,0 +1,64 @@
+{# Каркас админ-панели: боковое меню + верхняя панель + контент #}
+{% extends "layouts/base.njk" %}
+
+{% block bodyClass %}admin-body{% endblock %}
+
+{% block body %}
+{% set menu = [
+  { key: 'dashboard',    href: '/admin',              label: 'Басқару тақтасы', icon: 'dashboard' },
+  { key: 'orders',       href: '/admin/orders',       label: 'Тапсырыстар',     icon: 'receipt', badge: badges.orders },
+  { key: 'menu',         href: '/admin/menu',         label: 'Мәзір',           icon: 'utensils' },
+  { key: 'cafes',        href: '/admin/cafes',        label: 'Кафелер мен QR',   icon: 'store' },
+  { key: 'applications', href: '/admin/applications', label: 'Өтінімдер',       icon: 'inbox', badge: badges.applications },
+  { key: 'users',        href: '/admin/users',        label: 'Пайдаланушылар',  icon: 'users' }
+] %}
+
+<div class="admin">
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <a class="admin-sidebar__logo" href="/admin" aria-label="QR DINE Admin">
+      {{ logo({ className: 'logo logo--on-dark' }) }}
+      <span>Admin</span>
+    </a>
+
+    <nav class="admin-nav" aria-label="Әкімші мәзірі">
+      {% for item in menu %}
+        <a href="{{ item.href }}" class="admin-nav__link {% if section == item.key %}is-active{% endif %}">
+          {{ icon(item.icon) }}
+          <span>{{ item.label }}</span>
+          {% if item.badge %}<span class="admin-nav__badge">{{ item.badge }}</span>{% endif %}
+        </a>
+      {% endfor %}
+    </nav>
+
+    <div class="admin-sidebar__footer">
+      <a href="/" class="admin-nav__link">{{ icon('external') }} <span>Сайтты ашу</span></a>
+      <form action="/logout" method="post">
+        <button class="admin-nav__link" type="submit">{{ icon('logout') }} <span>Шығу</span></button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="icon-button show-mobile" type="button" data-toggle="#admin-sidebar" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Мәзір">
+        {{ icon('menu') }}
+      </button>
+      <div class="admin-topbar__title">
+        {% block breadcrumbs %}{% endblock %}
+        <h1>{{ title }}</h1>
+      </div>
+      <div class="admin-topbar__actions">
+        {% block actions %}{% endblock %}
+        <span class="admin-user">
+          <span class="avatar">{{ currentUser.name | initials }}</span>
+          <span class="hide-mobile">{{ currentUser.name }}</span>
+        </span>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "layouts/admin.njk" %}
+
+{% block breadcrumbs %}<a class="back-link" href="/admin/orders">{{ icon('arrow-left') }} Тапсырыстар</a>{% endblock %}
+
+{% block content %}
+<div class="detail-grid">
+  <section class="panel">
+    <header class="panel__head">
+      <h2>Тапсырыс құрамы</h2>
+      <span class="status status--{{ order.status }}">{{ ORDER_STATUSES[order.status].label }}</span>
+    </header>
+    <ul class="receipt">
+      {% for item in items %}
+        <li>
+          <span><strong>{{ item.quantity }} ×</strong> {{ item.name }} <span class="muted">({{ item.price | money }})</span></span>
+          <span>{{ (item.price * item.quantity) | money }}</span>
+        </li>
+      {% endfor %}
+      <li class="receipt__total"><span>Барлығы</span><strong>{{ order.total | money }}</strong></li>
+    </ul>
+    {% if order.comment %}<p class="note">{{ icon('message') }} {{ order.comment }}</p>{% endif %}
+  </section>
+
+  <aside class="stack">
+    <section class="panel">
+      <header class="panel__head"><h2>Ақпарат</h2></header>
+      <dl class="info-list">
+        <dt>Код</dt><dd class="order-code">{{ order.code }}</dd>
+        <dt>Кафе</dt><dd>{{ order.cafe_name }}</dd>
+        <dt>Үстел</dt><dd>№{{ order.table_number or '—' }}{% if order.table_label %} · {{ order.table_label }}{% endif %}</dd>
+        <dt>Қонақ</dt><dd>{{ order.customer_name }}</dd>
+        <dt>Телефон</dt><dd>{% if order.phone %}<a href="tel:{{ order.phone }}">{{ order.phone }}</a>{% else %}—{% endif %}</dd>
+        <dt>Уақыт</dt><dd>{{ order.created_at | datetime }}</dd>
+        <dt>Жаңартылды</dt><dd>{{ order.updated_at | datetime }}</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head"><h2>Мәртебені өзгерту</h2></header>
+      <div class="status-buttons">
+        {% for key, status in ORDER_STATUSES %}
+          <form action="/admin/orders/{{ order.id }}/status" method="post">
+            <input type="hidden" name="status" value="{{ key }}">
+            <button class="status-button status--{{ key }} {% if key == order.status %}is-current{% endif %}" type="submit" {% if key == order.status %}disabled{% endif %}>
+              {{ icon(status.icon) }} {{ status.label }}
+            </button>
+          </form>
+        {% endfor %}
+      </div>
+    </section>
+  </aside>
+</div>
+{% endblock %}

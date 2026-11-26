@@ -1,0 +1,11 @@
+{% extends "layouts/site.njk" %}
+
+{% block content %}
+<section class="container error-page">
+  <span class="error-page__code">{{ status }}</span>
+  <h1>{{ title }}</h1>
+  <p class="muted">{{ message }}</p>
+  <a class="btn btn--primary" href="/">{{ icon('arrow-left') }} Басты бетке</a>
+  {% if details %}<pre class="error-page__details">{{ details }}</pre>{% endif %}
+</section>
+{% endblock %}

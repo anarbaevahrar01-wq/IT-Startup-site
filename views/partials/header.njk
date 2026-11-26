@@ -1,0 +1,45 @@
+{# Шапка сайта. Ссылка активна, если адрес страницы начинается с её пути. #}
+{% set nav = [
+  { href: '/', label: 'Басты бет' },
+  { href: '/#cafes', label: 'Кафелер' },
+  { href: '/#how', label: 'Қалай жұмыс істейді' },
+  { href: '/#business', label: 'Бизнеске' },
+  { href: '/contacts', label: 'Байланыс' }
+] %}
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/" aria-label="QR DINE — басты бет">{{ logo({ className: 'logo' }) }}</a>
+
+    <nav class="site-nav" id="site-nav" aria-label="Негізгі мәзір">
+      {% for link in nav %}
+        <a href="{{ link.href }}" class="site-nav__link {% if currentPath == link.href %}is-active{% endif %}">{{ link.label }}</a>
+      {% endfor %}
+      <div class="site-nav__mobile-extra">
+        {% if currentUser %}
+          <a href="{{ '/admin' if currentUser.role == 'admin' else '/account' }}" class="site-nav__link">{{ icon('user') }} {{ currentUser.name }}</a>
+        {% else %}
+          <a href="/login" class="site-nav__link">{{ icon('user') }} Кіру</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="site-header__actions">
+      <a href="/cart" class="cart-button" aria-label="Себет">
+        {{ icon('cart') }}
+        <span id="cart-count" class="cart-button__count {% if not cartCount %}is-empty{% endif %}">{{ cartCount }}</span>
+      </a>
+      {% if currentUser %}
+        <a href="{{ '/admin' if currentUser.role == 'admin' else '/account' }}" class="btn btn--ghost btn--sm hide-mobile">
+          {{ icon('dashboard' if currentUser.role == 'admin' else 'user') }}
+          {{ 'Әкімші панелі' if currentUser.role == 'admin' else 'Кабинет' }}
+        </a>
+      {% else %}
+        <a href="/login" class="btn btn--ghost btn--sm hide-mobile">{{ icon('user') }} Кіру</a>
+      {% endif %}
+      <button class="icon-button show-mobile" type="button" data-toggle="#site-nav" aria-controls="site-nav" aria-expanded="false" aria-label="Мәзірді ашу">
+        {{ icon('menu') }}
+      </button>
+    </div>
+  </div>
+</header>

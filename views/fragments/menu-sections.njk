@@ -1,0 +1,20 @@
+{# Разделы меню по категориям. Используется на странице кафе и как ответ живого поиска. #}
+<div id="menu-sections" class="menu-sections">
+  {% for section in sections %}
+    <section class="menu-section" id="cat-{{ section.id }}" aria-labelledby="cat-title-{{ section.id }}">
+      <h2 class="menu-section__title" id="cat-title-{{ section.id }}">
+        {{ section.name }} <span class="muted">{{ section.items.length }}</span>
+      </h2>
+      <div class="dish-grid">
+        {% for item in section.items %}
+          {% include "partials/dish-card.njk" %}
+        {% endfor %}
+      </div>
+    </section>
+  {% else %}
+    <div class="empty-state">
+      {{ icon('search') }}
+      <p>{% if query %}«{{ query }}» бойынша ештеңе табылмады{% else %}Мәзір әзірге бос{% endif %}</p>
+    </div>
+  {% endfor %}
+</div>

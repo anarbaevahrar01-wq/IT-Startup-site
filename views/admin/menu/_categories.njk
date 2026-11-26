@@ -1,0 +1,26 @@
+{# Блок категорий. Добавление и удаление — через htmx, ответ заменяет весь блок. #}
+<section id="categories" class="panel">
+  <header class="panel__head"><h2>Санаттар</h2></header>
+
+  <ul class="category-list">
+    {% for category in categories %}
+      <li>
+        <span>{{ category.name }} <span class="muted">{{ category.items_count }}</span></span>
+        <button class="icon-button icon-button--danger" type="button"
+                hx-delete="/admin/menu/categories/{{ category.id }}"
+                hx-target="#categories" hx-swap="outerHTML"
+                hx-confirm="«{{ category.name }}» санатын жою керек пе? Тағамдар санатсыз қалады."
+                aria-label="Жою">{{ icon('trash') }}</button>
+      </li>
+    {% else %}
+      <li class="muted">Санаттар жоқ</li>
+    {% endfor %}
+  </ul>
+
+  <form class="inline-form" hx-post="/admin/menu/categories" hx-target="#categories" hx-swap="outerHTML">
+    <input type="hidden" name="cafe_id" value="{{ cafe.id }}">
+    <input class="input input--sm" name="name" placeholder="Жаңа санат" maxlength="60" required>
+    <button class="btn btn--primary btn--sm" type="submit" aria-label="Қосу">{{ icon('plus') }}</button>
+  </form>
+  {% if error %}<span class="field__error">{{ error }}</span>{% endif %}
+</section>

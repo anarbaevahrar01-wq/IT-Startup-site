@@ -1,0 +1,33 @@
+{% extends "layouts/site.njk" %}
+
+{% block content %}
+<section class="container order-page">
+  <div class="card order-card">
+    <header class="order-card__head">
+      <span class="eyebrow">{{ order.cafe_name }}{% if order.table_number %} · №{{ order.table_number }} үстел{% endif %}</span>
+      <h1>Тапсырыс <span class="order-code">{{ order.code }}</span></h1>
+      <p class="muted">{{ order.created_at | datetime }} · {{ order.customer_name }}</p>
+    </header>
+
+    {#
+      Блок статуса опрашивает сервер каждые 5 секунд.
+      Когда заказ завершён, сервер отвечает кодом 286 — и htmx останавливает опрос.
+    #}
+    {% include "fragments/order-status.njk" %}
+
+    <h2 class="card__subtitle">Тапсырыс құрамы</h2>
+    <ul class="receipt">
+      {% for item in items %}
+        <li><span>{{ item.name }} <span class="muted">× {{ item.quantity }}</span></span><span>{{ (item.price * item.quantity) | money }}</span></li>
+      {% endfor %}
+      <li class="receipt__total"><span>Барлығы</span><strong>{{ order.total | money }}</strong></li>
+    </ul>
+    {% if order.comment %}<p class="note">{{ icon('message') }} {{ order.comment }}</p>{% endif %}
+
+    <div class="order-card__actions">
+      <a class="btn btn--outline" href="/cafes/{{ order.cafe_slug }}">{{ icon('plus') }} Тағы тапсырыс беру</a>
+      {% if not currentUser %}<a class="btn btn--ghost" href="/register">Тапсырыстар тарихы үшін тіркеліңіз</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

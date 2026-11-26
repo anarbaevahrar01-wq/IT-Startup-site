@@ -1,0 +1,181 @@
+{% extends "layouts/site.njk" %}
+
+{% block content %}
+
+{# ================= HERO ================= #}
+<section class="hero">
+  <div class="container hero__grid">
+    <div class="hero__text">
+      <span class="eyebrow">{{ icon('scan') }} Заманауи мейрамхана тәжірибесі</span>
+      <h1 class="hero__title">Сканерле.<br>Тапсырыс бер.<br><span class="text-accent">Ләззат ал.</span></h1>
+      <p class="hero__lead">
+        Үстелдегі QR-кодты телефонмен сканерлеп, мәзірді ашыңыз, тағамды таңдап тапсырыс беріңіз.
+        Даяшыны күтпейсіз — тапсырыс бірден асханаға түседі.
+      </p>
+      <div class="hero__actions">
+        {% if cafes.length %}
+          <a class="btn btn--primary btn--lg" href="/cafes/{{ cafes[0].slug }}">Мәзірді ашу {{ icon('arrow-right') }}</a>
+        {% endif %}
+        <a class="btn btn--outline btn--lg" href="#how">Қалай жұмыс істейді?</a>
+      </div>
+      <dl class="hero__stats">
+        <div><dt>30+</dt><dd>тағам мен сусын</dd></div>
+        <div><dt>0 мин</dt><dd>даяшыны күту</dd></div>
+        <div><dt>24/7</dt><dd>онлайн мәзір</dd></div>
+      </dl>
+    </div>
+
+    {# Иллюстрация: «телефон» с меню и плавающая карточка QR #}
+    <div class="hero__visual" aria-hidden="true">
+      <div class="phone">
+        <div class="phone__notch"></div>
+        <div class="phone__screen">
+          <div class="phone__bar">{{ logo({ className: 'logo logo--xs' }) }}<span class="badge badge--accent">№3 үстел</span></div>
+          <div class="phone__chips"><span class="is-active">Ассорти</span><span>Салаттар</span><span>Шашлық</span></div>
+          {% for dish in [
+            { img: 'assorti-myasnoy.jpg', name: 'Мясной ассорти', price: 5000 },
+            { img: 'salad-caesar.jpg', name: 'Цезарь', price: 1700 },
+            { img: 'shashlyk-kuskovoy.jpg', name: 'Кусковой', price: 700 }
+          ] %}
+          <div class="phone__dish">
+            <img src="/img/menu/{{ dish.img }}" alt="" width="56" height="56">
+            <div><strong>{{ dish.name }}</strong><span>{{ dish.price | money }}</span></div>
+            <span class="phone__add">{{ icon('plus') }}</span>
+          </div>
+          {% endfor %}
+          <div class="phone__cart">{{ icon('cart') }} Себет · 3 <strong>7 400 ₸</strong></div>
+        </div>
+      </div>
+      <div class="float-card float-card--qr">
+        <div class="float-card__qr">{{ brandMark() }}</div>
+        <span>Сканерлеңіз</span>
+      </div>
+      <div class="float-card float-card--status">
+        <span class="float-card__icon">{{ icon('check') }}</span>
+        <div><strong>Тапсырыс қабылданды</strong><span>Дайындалуда · 12 мин</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ================= КАК ЭТО РАБОТАЕТ ================= #}
+<section class="section" id="how">
+  <div class="container">
+    <header class="section-head">
+      <span class="eyebrow">Оңай әрі ыңғайлы</span>
+      <h2 class="section-title">Үш қадам — бір тапсырыс</h2>
+      <p class="section-sub">Қосымша жүктеудің қажеті жоқ: телефон камерасы жеткілікті.</p>
+    </header>
+
+    <ol class="steps">
+      <li class="step">
+        <span class="step__icon">{{ icon('scan') }}</span>
+        <span class="step__num">01</span>
+        <h3>QR-кодты сканерлеңіз</h3>
+        <p>Үстелдегі кодқа камераны бағыттаңыз — мәзір бірден ашылады, үстел нөмірі автоматты түрде белгіленеді.</p>
+      </li>
+      <li class="step">
+        <span class="step__icon">{{ icon('utensils') }}</span>
+        <span class="step__num">02</span>
+        <h3>Тағамды таңдаңыз</h3>
+        <p>Суреттер, сипаттама және бағалар — бәрі бір жерде. Ұнағанын бір түртумен себетке қосыңыз.</p>
+      </li>
+      <li class="step">
+        <span class="step__icon">{{ icon('receipt') }}</span>
+        <span class="step__num">03</span>
+        <h3>Тапсырыс беріңіз</h3>
+        <p>Тапсырыс асханаға бірден түседі, ал сіз оның мәртебесін нақты уақытта бақылайсыз.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+{# ================= КАФЕ ================= #}
+<section class="section section--tinted" id="cafes">
+  <div class="container">
+    <header class="section-head">
+      <span class="eyebrow">Серіктестер</span>
+      <h2 class="section-title">Біздің кафелер</h2>
+      <p class="section-sub">QR DINE жүйесіне қосылған мекемелер.</p>
+    </header>
+
+    {% if cafes.length %}
+      <div class="cafe-grid">
+        {% for cafe in cafes %}
+          <a class="cafe-card" href="/cafes/{{ cafe.slug }}">
+            <div class="cafe-card__cover">
+              {% if cafe.cover_url %}<img src="{{ cafe.cover_url }}" alt="{{ cafe.name }}" loading="lazy">{% endif %}
+              <span class="badge badge--light">{{ cafe.items_count }} позиция</span>
+            </div>
+            <div class="cafe-card__body">
+              <h3>{{ cafe.name }}</h3>
+              {% if cafe.tagline %}<p class="muted">{{ cafe.tagline }}</p>{% endif %}
+              <ul class="meta-list">
+                {% if cafe.address %}<li>{{ icon('pin') }} {{ cafe.address }}</li>{% endif %}
+                {% if cafe.hours %}<li>{{ icon('clock') }} {{ cafe.hours }}</li>{% endif %}
+              </ul>
+              <span class="link-arrow">Мәзірді ашу {{ icon('arrow-right') }}</span>
+            </div>
+          </a>
+        {% endfor %}
+        <a class="cafe-card cafe-card--join" href="/contacts#partner">
+          <span class="cafe-card__plus">{{ icon('plus') }}</span>
+          <h3>Сіздің кафеңіз</h3>
+          <p class="muted">QR DINE-ге қосылып, тапсырыстарды цифрлық форматта қабылдаңыз.</p>
+          <span class="link-arrow">Өтінім қалдыру {{ icon('arrow-right') }}</span>
+        </a>
+      </div>
+    {% else %}
+      <p class="empty-state">Әзірге кафелер қосылмаған.</p>
+    {% endif %}
+  </div>
+</section>
+
+{# ================= ДЛЯ БИЗНЕСА ================= #}
+<section class="section" id="business">
+  <div class="container business">
+    <div class="business__text">
+      <span class="eyebrow">Кафе иелеріне</span>
+      <h2 class="section-title">Тапсырыстарды басқарудың<br>бәрі бір панельде</h2>
+      <p class="section-sub">Қағаз мәзір мен қате тапсырыстарды ұмытыңыз. QR DINE қызметкерлердің уақытын үнемдеп, орташа чекті арттыруға көмектеседі.</p>
+      <a class="btn btn--primary" href="/contacts#partner">Қосылу {{ icon('arrow-right') }}</a>
+    </div>
+    <ul class="features">
+      <li class="feature">
+        <span class="feature__icon">{{ icon('utensils') }}</span>
+        <h3>Цифрлық мәзір</h3>
+        <p>Бағаны, суретті, қолжетімділікті бірнеше секундта өзгертіңіз — басып шығарудың қажеті жоқ.</p>
+      </li>
+      <li class="feature">
+        <span class="feature__icon">{{ icon('qr') }}</span>
+        <h3>Үстелдерге QR-кодтар</h3>
+        <p>Әр үстелге жеке код: тапсырыс қай үстелден келгені бірден көрінеді.</p>
+      </li>
+      <li class="feature">
+        <span class="feature__icon">{{ icon('bell') }}</span>
+        <h3>Нақты уақыттағы тапсырыстар</h3>
+        <p>Жаңа тапсырыстар панельде автоматты түрде пайда болады, мәртебені бір түртумен өзгертесіз.</p>
+      </li>
+      <li class="feature">
+        <span class="feature__icon">{{ icon('chart') }}</span>
+        <h3>Аналитика</h3>
+        <p>Күндік түсім, орташа чек және ең танымал тағамдар — шешім қабылдауға арналған деректер.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+{# ================= CTA ================= #}
+<section class="container">
+  <div class="cta-banner">
+    <div>
+      <h2>Дәмді сәтіңізді бастаңыз</h2>
+      <p>Ұлттық тағамдар, салаттар мен сусындар — барлығы бір электронды мәзірде.</p>
+    </div>
+    {% if cafes.length %}
+      <a class="btn btn--accent btn--lg" href="/cafes/{{ cafes[0].slug }}">Тағамдарды таңдау {{ icon('arrow-right') }}</a>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

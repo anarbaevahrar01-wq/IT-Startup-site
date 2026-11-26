@@ -1,0 +1,4 @@
+{# Всплывающее уведомление, добавляется в #toasts через hx-swap-oob #}
+<div hx-swap-oob="beforeend:#toasts">
+  <div class="toast toast--{{ type or 'success' }}" role="status">{{ message }}</div>
+</div>
