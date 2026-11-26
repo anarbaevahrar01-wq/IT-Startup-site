@@ -674,6 +674,15 @@ img.avatar { object-fit: cover; }
 .order-row > span:nth-child(2) { display: grid; }
 .order-row > strong { text-align: right; font-family: var(--font-display); }
 
+/* Юридические страницы */
+.legal { max-width: 780px; padding-bottom: 40px; }
+.legal h2 { font-size: 21px; margin: 32px 0 12px; }
+.legal p, .legal li { color: #3c4a44; }
+.legal ul { display: grid; gap: 8px; padding-left: 20px; list-style: disc; }
+.legal a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.site-footer__legal { display: flex; gap: 20px; }
+.site-footer__legal a:hover { color: var(--accent); }
+
 /* Ошибки */
 .error-page { display: grid; justify-items: center; gap: 14px; text-align: center; padding: 96px 0; }
 .error-page__code { font-family: var(--font-display); font-weight: 900; font-size: 120px; line-height: 1; color: var(--accent); }

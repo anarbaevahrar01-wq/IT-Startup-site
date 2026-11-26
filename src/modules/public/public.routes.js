@@ -23,6 +23,16 @@ router.get('/contacts', (req, res) => {
   res.render('pages/contacts', { title: 'Байланыс', team: TEAM });
 });
 
+/* ---------- Юридические страницы (нужны для входа через Google) ---------- */
+
+router.get('/privacy', (req, res) => {
+  res.render('pages/legal', { title: 'Құпиялылық саясаты', page: 'privacy' });
+});
+
+router.get('/terms', (req, res) => {
+  res.render('pages/legal', { title: 'Пайдалану шарттары', page: 'terms' });
+});
+
 /* ---------- Заявка от кафе (форма отправляется через htmx) ---------- */
 
 const applicationSchema = z.object({
