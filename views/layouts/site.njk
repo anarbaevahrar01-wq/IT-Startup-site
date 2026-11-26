@@ -1,0 +1,11 @@
+{# Каркас публичного сайта: шапка + контент + подвал #}
+{% extends "layouts/base.njk" %}
+
+{% block body %}
+  <a class="skip-link" href="#main">Негізгі мазмұнға өту</a>
+  {% include "partials/header.njk" %}
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+  {% include "partials/footer.njk" %}
+{% endblock %}

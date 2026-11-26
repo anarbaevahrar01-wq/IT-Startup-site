@@ -1,0 +1,63 @@
+{% extends "layouts/site.njk" %}
+{% from "partials/form.njk" import field_error, form_error %}
+
+{% block content %}
+<section class="page-head page-head--compact">
+  <div class="container">
+    <h1>Себет</h1>
+    {% if cart.cafe %}<p class="muted">{{ icon('store') }} {{ cart.cafe.name }}</p>{% endif %}
+  </div>
+</section>
+
+<section class="container checkout-layout">
+  {% include "fragments/cart-panel.njk" %}
+
+  {# Форма оформления. Без htmx-атрибутов: hx-boost отправит её фоном, а при
+     ошибке валидации сервер вернёт эту же страницу с подсказками (статус 422). #}
+  <div id="checkout">
+    {% if not cart.isEmpty %}
+      <form class="card checkout-card" action="/orders" method="post" novalidate>
+        <h2 class="card__title">Тапсырысты рәсімдеу</h2>
+        {{ form_error(errors) }}
+
+        <label class="field">
+          <span class="field__label">Атыңыз *</span>
+          <input class="input" name="customer_name" required maxlength="60" autocomplete="name"
+                 value="{{ values.customer_name or (currentUser.name if currentUser else '') }}">
+          {{ field_error(errors, 'customer_name') }}
+        </label>
+
+        <label class="field">
+          <span class="field__label">Үстел *</span>
+          <select class="input" name="table_id" required>
+            <option value="">Үстелді таңдаңыз</option>
+            {% for table in tables %}
+              <option value="{{ table.id }}" {% if table.id == selectedTableId %}selected{% endif %}>
+                №{{ table.number }}{% if table.label %} · {{ table.label }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+          {{ field_error(errors, 'table_id') }}
+        </label>
+
+        <label class="field">
+          <span class="field__label">Телефон <span class="muted">(міндетті емес)</span></span>
+          <input class="input" name="phone" type="tel" maxlength="20" autocomplete="tel" placeholder="+7 7__ ___ __ __" value="{{ values.phone }}">
+          {{ field_error(errors, 'phone') }}
+        </label>
+
+        <label class="field">
+          <span class="field__label">Пікір <span class="muted">(міндетті емес)</span></span>
+          <textarea class="input" name="comment" rows="3" maxlength="300" placeholder="Мысалы: пиязсыз, ащы емес">{{ values.comment }}</textarea>
+          {{ field_error(errors, 'comment') }}
+        </label>
+
+        <button class="btn btn--primary btn--lg btn--block" type="submit">
+          Тапсырыс беру · <span id="checkout-total">{{ cart.total | money }}</span>
+        </button>
+        <p class="hint">Төлем тапсырыс әкелінгенде жүргізіледі.</p>
+      </form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

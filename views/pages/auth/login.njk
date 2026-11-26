@@ -1,0 +1,29 @@
+{% extends "layouts/site.njk" %}
+{% from "partials/form.njk" import field_error, form_error %}
+
+{% block content %}
+<section class="auth">
+  <form class="card auth__card" action="/login" method="post" novalidate>
+    <a href="/" class="auth__logo" aria-label="QR DINE">{{ brandMark() }}</a>
+    <h1>Қайта қош келдіңіз</h1>
+    <p class="muted">Аккаунтыңызға кіріңіз</p>
+
+    {{ form_error(errors) }}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <label class="field">
+      <span class="field__label">Email</span>
+      <input class="input" name="email" type="email" required autocomplete="email" autofocus value="{{ values.email }}">
+      {{ field_error(errors, 'email') }}
+    </label>
+    <label class="field">
+      <span class="field__label">Құпиясөз</span>
+      <input class="input" name="password" type="password" required autocomplete="current-password">
+      {{ field_error(errors, 'password') }}
+    </label>
+
+    <button class="btn btn--primary btn--block btn--lg" type="submit">Кіру</button>
+    <p class="auth__switch">Аккаунтыңыз жоқ па? <a href="/register">Тіркелу</a></p>
+  </form>
+</section>
+{% endblock %}

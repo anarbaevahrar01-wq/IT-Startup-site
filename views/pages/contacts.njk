@@ -1,0 +1,46 @@
+{% extends "layouts/site.njk" %}
+
+{% block content %}
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Бізбен танысыңыз</span>
+    <h1>Байланыс және команда</h1>
+    <p class="section-sub">QR DINE жобасын дамытып жатқан шығармашыл команда.</p>
+  </div>
+</section>
+
+<section class="section section--flush-top">
+  <div class="container">
+    <div class="team-grid">
+      {% for member in team %}
+        <article class="team-card">
+          <span class="avatar avatar--lg">{{ member.name | initials }}</span>
+          <h3>{{ member.name }}</h3>
+          <p class="muted">{{ member.role }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--tinted" id="partner">
+  <div class="container partner">
+    <div class="partner__text">
+      <span class="eyebrow">Серіктестік</span>
+      <h2 class="section-title">Кафеңізді қосқыңыз келе ме?</h2>
+      <p class="section-sub">Өтінім қалдырыңыз — біз 24 сағат ішінде хабарласып, мәзірді жүйеге енгізуге көмектесеміз.</p>
+      <ul class="check-list">
+        <li>{{ icon('check') }} Мәзірді тегін цифрландыру</li>
+        <li>{{ icon('check') }} Әр үстелге QR-код дайындау</li>
+        <li>{{ icon('check') }} Қызметкерлерге панельді үйрету</li>
+      </ul>
+      <ul class="meta-list meta-list--lg">
+        <li><a href="https://wa.me/77058976616" target="_blank" rel="noopener">{{ icon('message') }} WhatsApp: +7 705 897 66 16</a></li>
+        <li>{{ icon('pin') }} Түркістан қ., Қазақстан</li>
+      </ul>
+    </div>
+    {% set values = {} %}
+    {% include "fragments/application-form.njk" %}
+  </div>
+</section>
+{% endblock %}

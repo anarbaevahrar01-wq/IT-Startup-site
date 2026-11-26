@@ -1,0 +1,18 @@
+{# Карточки активных заказов на главной админки #}
+{% if activeOrders.length %}
+  <div class="live-orders">
+    {% for order in activeOrders %}
+      <a class="live-order live-order--{{ order.status }}" href="/admin/orders/{{ order.id }}">
+        <div class="live-order__top">
+          <span class="table-badge">№{{ order.table_number or '—' }}</span>
+          <span class="status status--{{ order.status }}">{{ ORDER_STATUSES[order.status].label }}</span>
+        </div>
+        <strong>{{ order.customer_name }}</strong>
+        <span class="muted">{{ order.items_count }} дана · {{ order.total | money }}</span>
+        <span class="live-order__time">{{ icon('clock') }} {{ order.created_at | ago }}</span>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="empty-state empty-state--sm">{{ icon('check-circle') }} Белсенді тапсырыстар жоқ</p>
+{% endif %}

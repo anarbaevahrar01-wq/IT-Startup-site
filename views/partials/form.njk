@@ -1,0 +1,17 @@
+{# Макросы для форм: вывод ошибок валидации #}
+
+{# Ошибка конкретного поля: {{ field_error(errors, 'email') }} #}
+{% macro field_error(errors, name) %}
+  {%- if errors and errors[name] -%}
+    <span class="field__error" role="alert">{{ errors[name] }}</span>
+  {%- endif -%}
+{% endmacro %}
+
+{# Общая ошибка формы (ключ _form): {{ form_error(errors) }} #}
+{% macro form_error(errors) %}
+  {%- if errors and errors._form -%}
+    <div class="alert alert--error" role="alert">{{ errors._form }}</div>
+  {%- elif errors -%}
+    <div class="alert alert--error" role="alert">Форманы тексеріңіз — кейбір өрістер дұрыс толтырылмаған.</div>
+  {%- endif -%}
+{% endmacro %}

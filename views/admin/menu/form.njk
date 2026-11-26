@@ -1,0 +1,73 @@
+{% extends "layouts/admin.njk" %}
+{% from "partials/form.njk" import field_error, form_error %}
+
+{% block breadcrumbs %}<a class="back-link" href="/admin/menu?cafe={{ cafe.id }}">{{ icon('arrow-left') }} Мәзір · {{ cafe.name }}</a>{% endblock %}
+
+{% block content %}
+<form class="form-layout" action="{{ '/admin/menu/' + item.id if item else '/admin/menu' }}" method="post" enctype="multipart/form-data" novalidate>
+  <input type="hidden" name="cafe_id" value="{{ cafe.id }}">
+
+  <section class="panel">
+    <header class="panel__head"><h2>Негізгі ақпарат</h2></header>
+    <div class="panel__body">
+      {{ form_error(errors) }}
+
+      <label class="field">
+        <span class="field__label">Атауы *</span>
+        <input class="input" name="name" required maxlength="80" value="{{ values.name }}">
+        {{ field_error(errors, 'name') }}
+      </label>
+
+      <div class="form-row">
+        <label class="field">
+          <span class="field__label">Санат</span>
+          <select class="input" name="category_id">
+            <option value="">— Санатсыз —</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}" {% if category.id == (values.category_id | int) %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Бағасы, ₸ *</span>
+          <input class="input" name="price" type="number" min="0" step="10" required value="{{ values.price }}">
+          {{ field_error(errors, 'price') }}
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field__label">Сипаттама</span>
+        <textarea class="input" name="description" rows="3" maxlength="300" placeholder="Құрамы, салмағы, ерекшеліктері">{{ values.description }}</textarea>
+        {{ field_error(errors, 'description') }}
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" name="is_available" value="1" {% if values.is_available and values.is_available != '0' %}checked{% endif %}>
+        <span>Мәзірде көрсету (қолжетімді)</span>
+      </label>
+    </div>
+  </section>
+
+  <aside class="stack">
+    <section class="panel">
+      <header class="panel__head"><h2>Сурет</h2></header>
+      <div class="panel__body">
+        <label class="upload">
+          <img class="upload__preview {% if not values.image_url %}is-hidden{% endif %}" src="{{ values.image_url or '' }}" alt="" data-preview-target>
+          <span class="upload__placeholder">{{ icon('image') }} Суретті таңдаңыз<br><small>JPG, PNG, WEBP · 5 МБ дейін</small></span>
+          <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" data-preview>
+        </label>
+        {{ field_error(errors, 'image') }}
+        {% if item and item.image_url %}
+          <label class="checkbox"><input type="checkbox" name="remove_image" value="1"> <span>Суретті жою</span></label>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button class="btn btn--primary btn--block" type="submit">{{ icon('check') }} Сақтау</button>
+      <a class="btn btn--ghost btn--block" href="/admin/menu?cafe={{ cafe.id }}">Болдырмау</a>
+    </div>
+  </aside>
+</form>
+{% endblock %}

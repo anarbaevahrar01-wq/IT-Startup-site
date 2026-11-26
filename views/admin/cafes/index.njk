@@ -1,0 +1,34 @@
+{% extends "layouts/admin.njk" %}
+
+{% block actions %}
+  <a class="btn btn--primary btn--sm" href="/admin/cafes/new">{{ icon('plus') }} <span class="hide-mobile">Жаңа кафе</span></a>
+{% endblock %}
+
+{% block content %}
+<div class="admin-cafe-grid">
+  {% for cafe in cafes %}
+    <article class="panel admin-cafe">
+      <div class="admin-cafe__cover">
+        {% if cafe.cover_url %}<img src="{{ cafe.cover_url }}" alt="" loading="lazy">{% endif %}
+        <span class="status {{ 'status--completed' if cafe.is_active else 'status--cancelled' }}">{{ 'Белсенді' if cafe.is_active else 'Жасырын' }}</span>
+      </div>
+      <div class="panel__body">
+        <h2>{{ cafe.name }}</h2>
+        <p class="muted">/cafes/{{ cafe.slug }}</p>
+        <ul class="stat-row">
+          <li><strong>{{ cafe.items_count }}</strong><span>позиция</span></li>
+          <li><strong>{{ cafe.tables_count }}</strong><span>үстел</span></li>
+          <li><strong>{{ cafe.orders_count }}</strong><span>тапсырыс</span></li>
+        </ul>
+        <div class="button-row">
+          <a class="btn btn--outline btn--sm" href="/admin/cafes/{{ cafe.id }}">{{ icon('edit') }} Баптау</a>
+          <a class="btn btn--ghost btn--sm" href="/admin/menu?cafe={{ cafe.id }}">{{ icon('utensils') }} Мәзір</a>
+          <a class="btn btn--ghost btn--sm" href="/admin/cafes/{{ cafe.id }}/qr-print" hx-boost="false" target="_blank">{{ icon('printer') }} QR</a>
+        </div>
+      </div>
+    </article>
+  {% else %}
+    <div class="panel empty-state">{{ icon('store') }}<p>Кафелер әлі жоқ</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

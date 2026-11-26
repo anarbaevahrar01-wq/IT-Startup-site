@@ -1,0 +1,25 @@
+{# Статус заказа со шкалой прогресса. Сам себя обновляет, пока заказ активен. #}
+{% set current = ORDER_STATUSES[order.status] %}
+<div id="order-status" class="order-status order-status--{{ order.status }}"
+     {% if isActive %}hx-get="/orders/{{ order.code }}/status" hx-trigger="every 5s" hx-swap="outerHTML"{% endif %}>
+
+  <div class="order-status__current">
+    <span class="order-status__icon">{{ icon(current.icon) }}</span>
+    <div>
+      <strong>{{ current.label }}</strong>
+      <span>{{ current.hint }}</span>
+    </div>
+    {% if isActive %}<span class="live-dot" title="Автоматты түрде жаңарады"></span>{% endif %}
+  </div>
+
+  {% if order.status != 'cancelled' %}
+    <ol class="progress">
+      {% for step in steps %}
+        <li class="progress__step {% if loop.index0 < stepIndex %}is-done{% elif loop.index0 == stepIndex %}is-current{% endif %}">
+          <span class="progress__dot">{{ icon('check') }}</span>
+          <span class="progress__label">{{ ORDER_STATUSES[step].label }}</span>
+        </li>
+      {% endfor %}
+    </ol>
+  {% endif %}
+</div>

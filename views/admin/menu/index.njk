@@ -1,0 +1,53 @@
+{% extends "layouts/admin.njk" %}
+
+{% block actions %}
+  {% if cafe %}
+    <a class="btn btn--primary btn--sm" href="/admin/menu/new?cafe={{ cafe.id }}">{{ icon('plus') }} <span class="hide-mobile">Жаңа тағам</span></a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if not cafe %}
+  <div class="panel empty-state">
+    {{ icon('store') }}
+    <p>Алдымен кафе қосыңыз.</p>
+    <a class="btn btn--primary" href="/admin/cafes/new">Кафе қосу</a>
+  </div>
+{% else %}
+  {% if cafes.length > 1 %}
+    <form class="toolbar toolbar--plain" action="/admin/menu" method="get">
+      <select class="input input--sm" name="cafe" data-autosubmit aria-label="Кафе">
+        {% for c in cafes %}<option value="{{ c.id }}" {% if c.id == cafe.id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+      </select>
+    </form>
+  {% endif %}
+
+  <div class="menu-admin">
+    {# ---------- Категории ---------- #}
+    <aside>
+      {% include "admin/menu/_categories.njk" %}
+    </aside>
+
+    {# ---------- Позиции ---------- #}
+    <section class="panel">
+      <header class="panel__head">
+        <h2>Позициялар <span class="muted">{{ items.length }}</span></h2>
+      </header>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Тағам</th><th>Санат</th><th>Бағасы</th><th>Мәзірде</th><th class="table__actions"></th></tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+              {% include "admin/menu/_item-row.njk" %}
+            {% else %}
+              <tr><td colspan="5"><p class="empty-state empty-state--sm">Мәзір бос. «Жаңа тағам» батырмасын басыңыз.</p></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+{% endif %}
+{% endblock %}

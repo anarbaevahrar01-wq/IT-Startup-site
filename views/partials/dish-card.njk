@@ -1,0 +1,29 @@
+{#
+  Карточка блюда. Кнопка «+» — обычная форма: без JS она отправляется
+  стандартно, а с htmx — фоном (hx-swap="none"), и сервер обновляет
+  счётчики на странице через hx-swap-oob.
+#}
+{% set qty = quantities[item.id] if quantities else 0 %}
+<article class="dish-card">
+  <div class="dish-card__media">
+    {% if item.image_url %}
+      <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy" width="400" height="300">
+    {% else %}
+      <span class="dish-card__placeholder">{{ icon('utensils') }}</span>
+    {% endif %}
+  </div>
+  <div class="dish-card__body">
+    <h3 class="dish-card__name">{{ item.name }}</h3>
+    {% if item.description %}<p class="dish-card__desc">{{ item.description }}</p>{% endif %}
+    <div class="dish-card__footer">
+      <span class="price">{{ item.price | money }}</span>
+      <form action="/cart/items" method="post" hx-post="/cart/items" hx-swap="none">
+        <input type="hidden" name="itemId" value="{{ item.id }}">
+        <button class="add-button" type="submit" aria-label="«{{ item.name }}» себетке қосу">
+          {{ icon('plus') }}
+          <span id="qty-{{ item.id }}" class="add-button__qty {% if not qty %}is-empty{% endif %}">{{ qty }}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</article>

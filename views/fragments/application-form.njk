@@ -1,0 +1,44 @@
+{#
+  Форма заявки кафе. Отправляется через htmx; сервер отвечает либо этой же
+  формой с ошибками (422), либо блоком «спасибо» — он заменяет форму целиком.
+#}
+{% from "partials/form.njk" import field_error, form_error %}
+<form id="application-form" class="card form-card" action="/applications" method="post" novalidate
+      hx-post="/applications" hx-target="this" hx-swap="outerHTML" hx-disabled-elt="find button">
+  <h3 class="card__title">Өтінім қалдыру</h3>
+  {{ form_error(errors) }}
+
+  <div class="form-row">
+    <label class="field">
+      <span class="field__label">Кафе атауы *</span>
+      <input class="input" name="cafe_name" maxlength="120" required value="{{ values.cafe_name }}">
+      {{ field_error(errors, 'cafe_name') }}
+    </label>
+    <label class="field">
+      <span class="field__label">Аты-жөніңіз *</span>
+      <input class="input" name="contact_name" maxlength="80" required autocomplete="name" value="{{ values.contact_name }}">
+      {{ field_error(errors, 'contact_name') }}
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label class="field">
+      <span class="field__label">Телефон *</span>
+      <input class="input" name="phone" type="tel" maxlength="20" required autocomplete="tel" placeholder="+7 7__ ___ __ __" value="{{ values.phone }}">
+      {{ field_error(errors, 'phone') }}
+    </label>
+    <label class="field">
+      <span class="field__label">Email</span>
+      <input class="input" name="email" type="email" maxlength="120" autocomplete="email" value="{{ values.email }}">
+      {{ field_error(errors, 'email') }}
+    </label>
+  </div>
+
+  <label class="field">
+    <span class="field__label">Хабарлама</span>
+    <textarea class="input" name="message" rows="4" maxlength="1000" placeholder="Мекенжай, үстел саны, сұрақтарыңыз…">{{ values.message }}</textarea>
+    {{ field_error(errors, 'message') }}
+  </label>
+
+  <button class="btn btn--primary btn--block" type="submit">Өтінім жіберу {{ icon('arrow-right') }}</button>
+</form>

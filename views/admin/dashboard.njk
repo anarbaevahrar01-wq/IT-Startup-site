@@ -1,0 +1,83 @@
+{% extends "layouts/admin.njk" %}
+
+{% block actions %}
+  <a class="btn btn--primary btn--sm" href="/admin/menu/new">{{ icon('plus') }} <span class="hide-mobile">Жаңа тағам</span></a>
+{% endblock %}
+
+{% block content %}
+{# ---------- Ключевые показатели ---------- #}
+<div class="kpi-grid">
+  <article class="kpi">
+    <span class="kpi__icon kpi__icon--green">{{ icon('wallet') }}</span>
+    <span class="kpi__label">Бүгінгі түсім</span>
+    <strong class="kpi__value">{{ stats.today.revenue | money }}</strong>
+    <span class="kpi__hint">{{ stats.today.orders }} тапсырыс</span>
+  </article>
+  <article class="kpi">
+    <span class="kpi__icon kpi__icon--amber">{{ icon('bell') }}</span>
+    <span class="kpi__label">Белсенді тапсырыстар</span>
+    <strong class="kpi__value">{{ stats.active }}</strong>
+    <span class="kpi__hint">{{ stats.counts.new or 0 }} жаңа</span>
+  </article>
+  <article class="kpi">
+    <span class="kpi__icon kpi__icon--blue">{{ icon('receipt') }}</span>
+    <span class="kpi__label">Орташа чек</span>
+    <strong class="kpi__value">{{ stats.averageCheck | money }}</strong>
+    <span class="kpi__hint">бас тартылғандарсыз</span>
+  </article>
+  <article class="kpi">
+    <span class="kpi__icon kpi__icon--violet">{{ icon('users') }}</span>
+    <span class="kpi__label">Пайдаланушылар</span>
+    <strong class="kpi__value">{{ usersCount }}</strong>
+    <span class="kpi__hint">тіркелген</span>
+  </article>
+</div>
+
+<div class="dashboard-grid">
+  {# ---------- Выручка за 7 дней (столбики на CSS) ---------- #}
+  <section class="panel">
+    <header class="panel__head">
+      <h2>Соңғы 7 күндегі түсім</h2>
+    </header>
+    <div class="bar-chart" role="img" aria-label="Күндік түсім диаграммасы">
+      {% for day in chart %}
+        <div class="bar-chart__col" title="{{ day.day }}: {{ day.revenue | money }} · {{ day.orders }} тапсырыс">
+          <span class="bar-chart__value">{{ (day.revenue / 1000) | round(1) if day.revenue else '' }}{{ 'k' if day.revenue }}</span>
+          <span class="bar-chart__bar {% if loop.last %}is-today{% endif %}" style="--h: {{ day.percent }}%"></span>
+          <span class="bar-chart__label">{{ day.weekday }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ---------- Топ блюд ---------- #}
+  <section class="panel">
+    <header class="panel__head"><h2>Ең танымал тағамдар</h2></header>
+    {% if topItems.length %}
+      <ol class="top-list">
+        {% for item in topItems %}
+          <li>
+            <span class="top-list__rank">{{ loop.index }}</span>
+            <span class="top-list__name">{{ item.name }}</span>
+            <span class="muted">{{ item.quantity }} дана</span>
+            <strong>{{ item.revenue | money }}</strong>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="empty-state empty-state--sm">Деректер әлі жоқ</p>
+    {% endif %}
+  </section>
+</div>
+
+{# ---------- Активные заказы — автообновление каждые 10 секунд ---------- #}
+<section class="panel">
+  <header class="panel__head">
+    <h2>Белсенді тапсырыстар <span class="live-dot" title="Автоматты түрде жаңарады"></span></h2>
+    <a class="link-arrow" href="/admin/orders">Барлығы {{ icon('arrow-right') }}</a>
+  </header>
+  <div hx-get="/admin/live-orders" hx-trigger="every 10s" hx-swap="innerHTML">
+    {% include "admin/_live-orders.njk" %}
+  </div>
+</section>
+{% endblock %}
