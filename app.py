@@ -282,8 +282,8 @@ def admin_create_cafe():
 
     if not name or len(name) > 100:
         return jsonify({"error": "Кафе атауын енгізіңіз"}), 400
-    if type(cabin_count) is not int or not 1 <= cabin_count <= 50:
-        return jsonify({"error": "Кабинка саны 1–50 аралығында болуы керек"}), 400
+    if type(cabin_count) is not int or not 1 <= cabin_count <= 200:
+        return jsonify({"error": "Кабинка (үстел) саны 1–200 аралығында болуы керек"}), 400
     if not isinstance(raw_menu, list) or len(raw_menu) > 300:
         return jsonify({"error": "Мәзір тізімі дұрыс емес"}), 400
 
