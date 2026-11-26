@@ -16,7 +16,8 @@ export const securityHeaders = helmet({
       'default-src': ["'self'"],
       'script-src': ["'self'"],
       'style-src': ["'self'", "'unsafe-inline'"],
-      'img-src': ["'self'", 'data:', 'blob:'],
+      // googleusercontent.com — фото профиля Google в личном кабинете и админке
+      'img-src': ["'self'", 'data:', 'blob:', 'https://*.googleusercontent.com'],
       'font-src': ["'self'", 'data:'],
       'connect-src': ["'self'"],
       'form-action': ["'self'"],

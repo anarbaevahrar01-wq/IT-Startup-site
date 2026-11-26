@@ -8,23 +8,9 @@ import { hashPassword, verifyPassword } from '#src/lib/password.js';
 import { validate, text, email, z } from '#src/lib/validation.js';
 import { redirect, flash, safeNextUrl } from '#src/lib/http.js';
 import { requireAuth } from '#src/middleware/auth.js';
+import { signIn } from './session.js';
 
 const router = Router();
-
-/**
- * Входит под пользователем. Идентификатор сессии меняется (защита от
- * фиксации сессии), но корзина и выбранный стол сохраняются.
- */
-function signIn(req, userId) {
-  const { cart, table, recentOrders } = req.session;
-  return new Promise((resolve, reject) => {
-    req.session.regenerate((error) => {
-      if (error) return reject(error);
-      Object.assign(req.session, { userId, cart, table, recentOrders });
-      resolve();
-    });
-  });
-}
 
 /* ---------- Вход ---------- */
 

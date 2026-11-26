@@ -25,6 +25,7 @@ import cafesRoutes from '#src/modules/cafes/cafes.routes.js';
 import cartRoutes from '#src/modules/cart/cart.routes.js';
 import ordersRoutes from '#src/modules/orders/orders.routes.js';
 import authRoutes from '#src/modules/auth/auth.routes.js';
+import googleAuthRoutes from '#src/modules/auth/google.routes.js';
 import adminRoutes from '#src/modules/admin/index.js';
 
 export function createApp() {
@@ -60,6 +61,7 @@ export function createApp() {
   views.addGlobal('baseUrl', config.baseUrl);
   views.addGlobal('assetVersion', Date.now().toString(36)); // сброс кеша CSS/JS при перезапуске
   views.addGlobal('year', new Date().getFullYear());
+  views.addGlobal('googleEnabled', config.google.enabled); // показывать ли кнопку «Google арқылы кіру»
 
   /* ---------- Базовые middleware ---------- */
   app.use(securityHeaders);
@@ -101,6 +103,7 @@ export function createApp() {
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
   app.use(publicRoutes);
   app.use(authRoutes);
+  app.use(googleAuthRoutes);
   app.use(cafesRoutes);
   app.use(cartRoutes);
   app.use(ordersRoutes);

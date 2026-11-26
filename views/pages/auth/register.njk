@@ -8,6 +8,9 @@
     <h1>Тіркелу</h1>
     <p class="muted">Тапсырыстар тарихын сақтау үшін аккаунт ашыңыз</p>
 
+    {% set label = 'Google арқылы тіркелу' %}
+    {% include "partials/google-button.njk" %}
+
     {{ form_error(errors) }}
 
     <label class="field">

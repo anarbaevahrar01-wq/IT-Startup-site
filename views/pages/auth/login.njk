@@ -8,6 +8,8 @@
     <h1>Қайта қош келдіңіз</h1>
     <p class="muted">Аккаунтыңызға кіріңіз</p>
 
+    {% include "partials/google-button.njk" %}
+
     {{ form_error(errors) }}
     <input type="hidden" name="next" value="{{ next }}">
 

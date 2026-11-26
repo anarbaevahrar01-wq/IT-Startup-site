@@ -130,6 +130,28 @@ views (Nunjucks) — полная страница или фрагмент дл�
 - Ошибки валидации — статус **422**, htmx настроен вставлять такие ответы (`<meta name="htmx-config">`).
 - Inline-JS запрещён CSP — всё поведение в `public/js/app.js` через делегирование событий.
 
+## Вход через Google
+
+Регистрация и вход через Google-аккаунт работают по OAuth 2.0 (Authorization Code + PKCE)
+без сторонних библиотек — см. `src/modules/auth/google.service.js` и `google.routes.js`.
+
+- Новый пользователь Google → создаётся аккаунт (регистрация).
+- Email уже зарегистрирован паролем → Google-аккаунт привязывается к нему
+  (принимаются только email, подтверждённые Google).
+- Без ключей `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` кнопка просто не показывается.
+
+**Как получить ключи:**
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → создайте проект.
+2. **APIs & Services → OAuth consent screen**: тип *External*, название «QR DINE», email поддержки.
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID**, тип *Web application*.
+4. **Authorized redirect URIs**:
+   - `http://localhost:3000/auth/google/callback` — для разработки;
+   - `https://it-startup-site-1.onrender.com/auth/google/callback` — для сайта на Render.
+5. Скопируйте *Client ID* и *Client secret* в `.env` (локально) и в **Environment** на Render.
+
+Адрес возврата строится из `BASE_URL`, поэтому он должен совпадать с адресом в Google Console.
+
 ## Логотип и иконки
 
 Логотип нарисован векторно в `src/lib/brand.js` (буквы — контуры, не шрифт).

@@ -2,7 +2,11 @@
 <tr id="user-{{ user.id }}">
   <td>
     <div class="media-cell">
-      <span class="avatar">{{ user.name | initials }}</span>
+      {% if user.avatar_url %}
+        <img class="avatar" src="{{ user.avatar_url }}" alt="" referrerpolicy="no-referrer">
+      {% else %}
+        <span class="avatar">{{ user.name | initials }}</span>
+      {% endif %}
       <div>
         <strong>{{ user.name }}{% if isSelf %} <span class="muted">(сіз)</span>{% endif %}</strong>
         <span class="muted block">{{ user.email }}</span>

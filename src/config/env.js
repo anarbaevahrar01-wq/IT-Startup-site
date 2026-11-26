@@ -39,6 +39,18 @@ export const config = Object.freeze({
     database: process.env.DATABASE_PATH ?? path.join(storageDir, 'qrdine.db'),
   },
 
+  /**
+   * Вход через Google. Если ключи не заданы — кнопка «Войти через Google»
+   * просто не показывается, остальной сайт работает как обычно.
+   */
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+    get enabled() {
+      return Boolean(this.clientId && this.clientSecret);
+    },
+  },
+
   admin: {
     name: process.env.ADMIN_NAME ?? 'Әкімші',
     email: process.env.ADMIN_EMAIL ?? 'admin@qrdine.kz',

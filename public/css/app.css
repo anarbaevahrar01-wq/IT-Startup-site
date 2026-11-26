@@ -654,6 +654,12 @@ select.input--sm { padding-right: 36px; }
 .auth__card h1 { font-size: 28px; margin-bottom: 4px; }
 .auth__card > .muted { margin-bottom: 24px; }
 .auth__logo { display: block; width: 64px; height: 64px; margin-bottom: 20px; }
+.btn--google { --btn-bg: #fff; --btn-fg: #1f1f1f; --btn-border: var(--line-strong); font-weight: 600; }
+.btn--google:hover { --btn-bg: #f8f9fa; }
+.google-logo { width: 20px; height: 20px; flex-shrink: 0; }
+.auth__divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--muted); font-size: 13px; }
+.auth__divider::before, .auth__divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+img.avatar { object-fit: cover; }
 .auth__switch { text-align: center; margin-top: 20px; color: var(--muted); font-size: 14.5px; }
 .auth__switch a { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 

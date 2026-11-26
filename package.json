@@ -15,7 +15,7 @@
     "start": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/server.js",
     "db:reset": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning scripts/reset-db.js",
     "brand": "node scripts/generate-brand.js",
-    "test": "node --disable-warning=ExperimentalWarning --test"
+    "test": "node --disable-warning=ExperimentalWarning --test test/"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.1.0",
